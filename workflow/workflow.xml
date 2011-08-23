@@ -1,0 +1,172 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<openerp>
+    <data>
+        ##############################################################################
+        #
+        #    container module for OpenERP, Manages containers receipt
+        #    Copyright (C) 2011 SYLEAM Info Services ([http://www.Syleam.fr/]) 
+        #              Sylvain Garancher [sylvain.garancher@syleam.fr]
+        #
+        #    This file is a part of container
+        #
+        #    container is free software: you can redistribute it and/or modify
+        #    it under the terms of the GNU General Public License as published by
+        #    the Free Software Foundation, either version 3 of the License, or
+        #    (at your option) any later version.
+        #
+        #    container is distributed in the hope that it will be useful,
+        #    but WITHOUT ANY WARRANTY; without even the implied warranty of
+        #    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+        #    GNU General Public License for more details.
+        #
+        #    You should have received a copy of the GNU General Public License
+        #    along with this program.  If not, see [http://www.gnu.org/licenses/].
+        #
+        ##############################################################################
+
+        #
+        # Workflow
+        #
+        <record id="wkf_container" model="workflow">
+            <field name="name">Container</field>
+            <field name="osv">container.container</field>
+            <field name="on_create">True</field>
+        </record>
+
+        #
+        # States
+        #
+        <record id="wkf_act_draft" model="workflow.activity">
+            <field name="wkf_id" ref="wkf_container"/>
+            <field name="flow_start">True</field>
+            <field name="name">draft</field>
+            <field name="kind">function</field>
+            <field name="action">write({'state': 'draft'})</field>
+        </record>
+        <record id="wkf_act_booking" model="workflow.activity">
+            <field name="wkf_id" ref="wkf_container"/>
+            <field name="name">booking</field>
+            <field name="kind">function</field>
+            <field name="action">action_booking()
+write({'state': 'booking'})</field>
+        </record>
+        <record id="wkf_act_freight" model="workflow.activity">
+            <field name="wkf_id" ref="wkf_container"/>
+            <field name="name">freight</field>
+            <field name="kind">function</field>
+            <field name="action">action_freight()
+write({'state': 'freight'})</field>
+        </record>
+        <record id="wkf_act_clearance" model="workflow.activity">
+            <field name="wkf_id" ref="wkf_container"/>
+            <field name="name">clearance</field>
+            <field name="kind">function</field>
+            <field name="action">action_clearance()
+write({'state': 'clearance'})</field>
+        </record>
+        <record id="wkf_act_approaching" model="workflow.activity">
+            <field name="wkf_id" ref="wkf_container"/>
+            <field name="name">approaching</field>
+            <field name="kind">function</field>
+            <field name="action">write({'state': 'approaching'})</field>
+        </record>
+        <record id="wkf_act_unpacking" model="workflow.activity">
+            <field name="wkf_id" ref="wkf_container"/>
+            <field name="name">unpacking</field>
+            <field name="kind">function</field>
+            <field name="action">action_unpacking()
+write({'state': 'unpacking'})</field>
+        </record>
+        <record id="wkf_act_delivered" model="workflow.activity">
+            <field name="wkf_id" ref="wkf_container"/>
+            <field name="name">delivered</field>
+            <field name="kind">function</field>
+            <field name="action">action_delivered()
+write({'state': 'delivered'})</field>
+            <field name="flow_stop">True</field>
+        </record>
+        <record id="wkf_act_cancel" model="workflow.activity">
+            <field name="wkf_id" ref="wkf_container"/>
+            <field name="name">cancel</field>
+            <field name="kind">function</field>
+            <field name="action">action_cancel()
+write({'state': 'cancel'})</field>
+            <field name="flow_stop">True</field>
+        </record>
+
+        #
+        # Tansitions
+        #
+        <record id="wkf_trans_draft_booking" model="workflow.transition">
+            <field name="act_from" ref="wkf_act_draft"/>
+            <field name="act_to" ref="wkf_act_booking"/>
+            <field name="signal">button_booking</field>
+        </record>
+        <record id="wkf_trans_booking_draft" model="workflow.transition">
+            <field name="act_from" ref="wkf_act_booking"/>
+            <field name="act_to" ref="wkf_act_draft"/>
+            <field name="signal">button_draft</field>
+        </record>
+        <record id="wkf_trans_booking_freight" model="workflow.transition">
+            <field name="act_from" ref="wkf_act_booking"/>
+            <field name="act_to" ref="wkf_act_freight"/>
+            <field name="signal">button_freight</field>
+        </record>
+        <record id="wkf_trans_freight_clearance" model="workflow.transition">
+            <field name="act_from" ref="wkf_act_freight"/>
+            <field name="act_to" ref="wkf_act_clearance"/>
+            <field name="signal">button_clearance</field>
+        </record>
+        <record id="wkf_trans_clearance_approaching" model="workflow.transition">
+            <field name="act_from" ref="wkf_act_clearance"/>
+            <field name="act_to" ref="wkf_act_approaching"/>
+            <field name="signal">button_approach</field>
+        </record>
+        <record id="wkf_trans_approaching_unpacking" model="workflow.transition">
+            <field name="act_from" ref="wkf_act_approaching"/>
+            <field name="act_to" ref="wkf_act_unpacking"/>
+            <field name="signal">button_unpack</field>
+        </record>
+        <record id="wkf_trans_unpacking_delivered" model="workflow.transition">
+            <field name="act_from" ref="wkf_act_unpacking"/>
+            <field name="act_to" ref="wkf_act_delivered"/>
+            <field name="signal">button_deliver</field>
+        </record>
+        <record id="wkf_trans_draft_cancel" model="workflow.transition">
+            <field name="act_from" ref="wkf_act_draft"/>
+            <field name="act_to" ref="wkf_act_cancel"/>
+            <field name="signal">button_cancel</field>
+        </record>
+        <record id="wkf_trans_booking_cancel" model="workflow.transition">
+            <field name="act_from" ref="wkf_act_booking"/>
+            <field name="act_to" ref="wkf_act_cancel"/>
+            <field name="signal">button_cancel</field>
+        </record>
+        <record id="wkf_trans_freight_cancel" model="workflow.transition">
+            <field name="act_from" ref="wkf_act_freight"/>
+            <field name="act_to" ref="wkf_act_cancel"/>
+            <field name="signal">button_cancel</field>
+        </record>
+        <record id="wkf_trans_clearance_cancel" model="workflow.transition">
+            <field name="act_from" ref="wkf_act_clearance"/>
+            <field name="act_to" ref="wkf_act_cancel"/>
+            <field name="signal">button_cancel</field>
+        </record>
+        <record id="wkf_trans_approaching_cancel" model="workflow.transition">
+            <field name="act_from" ref="wkf_act_approaching"/>
+            <field name="act_to" ref="wkf_act_cancel"/>
+            <field name="signal">button_cancel</field>
+        </record>
+        <record id="wkf_trans_unpacking_cancel" model="workflow.transition">
+            <field name="act_from" ref="wkf_act_unpacking"/>
+            <field name="act_to" ref="wkf_act_cancel"/>
+            <field name="signal">button_cancel</field>
+        </record>
+        <record id="wkf_trans_cancel_draft" model="workflow.transition">
+            <field name="act_from" ref="wkf_act_cancel"/>
+            <field name="act_to" ref="wkf_act_draft"/>
+            <field name="signal">button_draft</field>
+        </record>
+
+    </data>
+</openerp>
