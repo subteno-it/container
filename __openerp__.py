@@ -38,7 +38,7 @@
     'init_xml': [],
     'images': [],
     'update_xml': [
-        #'security/ir.model.access.csv',
+        'security/ir.model.access.csv',
         #'wizard/wizard.xml',
         'workflow/workflow.xml',
         'container_view.xml',
