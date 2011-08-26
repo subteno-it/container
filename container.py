@@ -59,23 +59,23 @@ class container_container(osv.osv):
 
     _columns = {
         'name': fields.char('Name', size=64, required=True, help='Name of the container'),
-        'partner_id': fields.many2one('res.partner', 'Freight Broker', required=True, readonly=True,
-                                      states={'draft': [('required', False), ('readonly', False)], 'booking': [('readonly', False)]},
+        'partner_id': fields.many2one('res.partner', 'Freight Broker', readonly=True,
+                                      states={'draft': [('readonly', False)], 'booking': [('readonly', False), ('required', True)]},
                                       help='Partner whom shipping container'),
-        'address_id': fields.many2one('res.partner.address', 'Address to retrieve the container', required=True, readonly=True,
-                                      states={'draft': [('required', False), ('readonly', False)], 'booking': [('readonly', False)]},
+        'address_id': fields.many2one('res.partner.address', 'Address to retrieve the container', readonly=True,
+                                      states={'draft': [('readonly', False)], 'booking': [('readonly', False), ('required', True)]},
                                       help='Address whom the container is located, used to retrieve it'),
-        'sscc': fields.char('SSCC', size=18, required=True, readonly=True,
-                            states={'draft': [('required', False), ('readonly', False)], 'booking': [('readonly', False)]},
+        'sscc': fields.char('SSCC', size=18, readonly=True,
+                            states={'draft': [('readonly', False)], 'booking': [('readonly', False), ('required', True)]},
                             help='Serial Shipping Container Code : unique worldwide identifier for shipping units (given by the shipping company at booking). This field should be formatted to 18 numeric character.'),
-        'etd_date': fields.date('Date of departure', required=True, readonly=True,
-                                states={'draft': [('required', False)], 'booking': [('readonly', False)]},
+        'etd_date': fields.date('Date of departure', readonly=True,
+                                states={'draft': [('readonly', False)], 'booking': [('readonly', False), ('required', True)]},
                                 help='Date of departure'),
-        'eta_date': fields.date('Estimated date of arrival', required=True, readonly=True,
-                                states={'draft': [('required', False)], 'booking': [('readonly', False)], 'freight': [('readonly', False)]},
+        'eta_date': fields.date('Estimated date of arrival', readonly=True,
+                                states={'booking': [('readonly', False), ('required', True)], 'freight': [('readonly', False), ('required', True)]},
                                 help='Estimated date of arrival'),
-        'etm_date': fields.date('Estimated time to market', required=True,
-                                states={'draft': [('required', False), ('readonly', True)], 'unpacking': [('readonly', True)], 'cancel': [('readonly', True)], 'delivered': [('readonly', True)]},
+        'etm_date': fields.date('Estimated time to market',
+                                states={'draft': [('readonly', True)], 'unpacking': [('readonly', True)], 'cancel': [('readonly', True)], 'delivered': [('readonly', True)]},
                                 help='Estimated date products available for delivery to customer'),
         'rda_date': fields.datetime('RDV', readonly=True,
                                     states={'approaching': [('required', True), ('readonly', False)]},
@@ -302,15 +302,15 @@ class container_container(osv.osv):
             in_move_ids = stock_move_obj.search(cr, uid, [('picking_id.container_id', '=', container.id), ('picking_id.type', '=', 'in')], context=context)
             in_move_data = stock_move_obj.read(cr, uid, in_move_ids, ['product_id', 'product_qty'], context=context)
             in_product_qty = {}
-            for product_id, product_qty in in_move_data:
-                in_product_qty[product_id] += product_qty
+            for in_move in in_move_data:
+                in_product_qty[in_move['product_id'][0]] = in_product_qty.get(in_move['product_id'][0], 0) +  in_move['product_qty']
 
             # Retrieve total out quantity per product
             out_move_ids = stock_move_obj.search(cr, uid, [('picking_id.container_id', '=', container.id), ('picking_id.type', '=', 'in')], context=context)
             out_move_data = stock_move_obj.read(cr, uid, out_move_ids, ['product_id', 'product_qty'], context=context)
             out_product_qty = {}
-            for product_id, product_qty in out_move_data:
-                out_product_qty[product_id] += product_qty
+            for out_move in out_move_data:
+                out_product_qty[out_move['product_id'][0]] = out_product_qty.get(out_move['product_id'][0], 0) + out_move['product_qty']
 
             picking = self.check_outgoing_incoming(cr, uid, out_product_qty, in_product_qty, context=context)
             if picking:
@@ -353,8 +353,8 @@ class container_container(osv.osv):
         """
         picking_prod = {}
 
-        for product_id, product_qty in picking1:
-            picking_prod[product_id] = min(max(0, product_qty - picking2[product_id]), product_qty)
+        for data in picking1:
+            picking_prod[data] = min(max(0, picking1[data] - picking2[data]), picking1[data])
 
         return picking_prod
 

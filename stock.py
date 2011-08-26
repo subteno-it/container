@@ -34,6 +34,20 @@ class stock_picking(osv.osv):
         'container_id': fields.many2one('container.container', 'Container', help='Container of this picking'),
     }
 
+    def create(self, cr, uid, values, context=None):
+        # Retrieve sale order id
+        sale_order_id = values.get('sale_id', False)
+
+        # Retrieve container id
+        if sale_order_id:
+            sale_order_data = self.pool.get('sale.order').read(cr, uid, sale_order_id, ['container_id'], context=context)
+            values['container_id'] = sale_order_data and sale_order_data['container_id'] and sale_order_data['container_id'][0] or False
+
+        # Call to standard behaviour
+        id = super(stock_picking, self).create(cr, uid, values, context=context)
+
+        return id
+
 stock_picking()
 
 # vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:

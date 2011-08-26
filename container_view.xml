@@ -87,10 +87,10 @@
                             </group>
                         </page>
                         <page string="Incoming picking">
-                            <field name="incoming_picking_list_ids" nolabel="1" colspan="4"/>
+                            <field name="incoming_picking_list_ids" widget="many2many" nolabel="1" colspan="4"/>
                         </page>
                         <page string="Outgoing picking">
-                            <field name="outgoing_picking_list_ids" nolabel="1" colspan="4"/>
+                            <field name="outgoing_picking_list_ids" widget="many2many" nolabel="1" colspan="4"/>
                         </page>
                     </notebook>
                     <field name="state"/>
