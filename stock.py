@@ -41,6 +41,7 @@ class stock_picking(osv.osv):
         # Retrieve container id
         if sale_order_id:
             sale_order_data = self.pool.get('sale.order').read(cr, uid, sale_order_id, ['container_id'], context=context)
+            # Add container_id in values
             values['container_id'] = sale_order_data and sale_order_data['container_id'] and sale_order_data['container_id'][0] or False
 
         # Call to standard behaviour

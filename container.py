@@ -142,6 +142,7 @@ class container_container(osv.osv):
         """
         id = super(container_container, self).create(cr, uid, values, context=context)
 
+        # Check date and set new if necessary
         if len(values.get('incoming_picking_list_ids', [])) and values.get('etd_date'):
             self.check_etd_date(cr, uid, [id], context=context)
             self.set_planned_date(cr, uid, [id], context=context)
@@ -154,9 +155,11 @@ class container_container(osv.osv):
         """
         res = super(container_container, self).write(cr, uid, ids, values, context=context)
 
+        # Check date from incoming pickings
         if values.get('incoming_picking_list_ids', False) or values.get('etd_date', False):
             self.check_etd_date(cr, uid, ids, context=context)
 
+        # Check date from outgoing pickings
         if values.get('outgoing_picking_list_ids', False) or values.get('etd_date', False):
             self.set_planned_date(cr, uid, ids, context=context)
 
@@ -166,34 +169,43 @@ class container_container(osv.osv):
         """
         Action lanched when arriving on booking state
         """
+        if context is None:
+            # There is no context in workflow, so get it on user
+            context = self.pool.get('res.users').context_get(cr, uid, context=context)
+
         stock_move_obj = self.pool.get('stock.move')
         stock_picking_obj = self.pool.get('stock.picking')
         wf_service = netsvc.LocalService('workflow')
 
         for container in self.browse(cr, uid, ids, context=context):
+            # Check container's location
             if container.incoterm_id.code in ['EXW', 'FCA', 'FAS', 'FOB', 'CFR', 'CIF', 'CPT', 'CIP'] and container.container_stock_location_id.usage != 'internal':
                 raise osv.except_osv(_('Warning !'), _('You must define container stock location as company location !'))
-
             elif container.incoterm_id.code in ['DAF', 'DES', 'DES', 'DDU', 'DDP'] and container.container_stock_location_id.usage != 'supplier':
                 raise osv.except_osv(_('Warning !'), _('You must define container stock location as supplier location !'))
 
+            # Check remaining volume
             if container.remaining_volume < 0:
                 raise osv.except_osv(_('Warning !'), _('Remaining volume must be positive !'))
 
             move_ids = []
             picking_ids = []
 
+            # Read incoming pickings list
             for picking in container.incoming_picking_list_ids:
                 picking_ids.append(picking.id)
                 move_ids.extend([data.id for data in picking.move_lines])
 
+            # Changes incoming moves' location to container's location
             stock_move_obj.write(cr, uid, move_ids, {'location_dest_id': container.container_stock_location_id.id}, context=context)
             if picking_ids != stock_picking_obj.search(cr, uid, [('id', 'in', picking_ids), ('state', 'not in', ('done', 'cancel'))], context=context):
                 raise osv.except_osv(_('Warning !'), _('Some Incoming packing list is in done or cancel state !'))
 
+            # Confirm all incoming pickings
             for picking in picking_ids:
                 wf_service.trg_validate(uid, 'stock.picking', picking, 'button_confirm', cr)
 
+            # Set container's departure date if necessary
             date_done = False
             if not container.etd_date:
                 for move in stock_move_obj.browse(cr, uid, move_ids, context=context):
@@ -205,14 +217,17 @@ class container_container(osv.osv):
 
                 self.write(cr, uid, [container.id], {'etd_date': date_done}, context=context)
 
+            # Set container's arrival date if necessary
             if not container.eta_date and date_done:
                 date_eta = datetime.datetime.strptime(date_done, '%Y-%m-%d %H:%M:%S') + datetime.timedelta(container.product_id.produce_delay or 0)
                 self.write(cr, uid, [container.id], {'eta_date': date_eta.strftime('%Y-%m-%d')}, context=context)
 
+            # Set container's market date if necessary
             if date_done:
                 date_etm = datetime.datetime.strptime(date_done, '%Y-%m-%d %H:%M:%S') + datetime.timedelta(container.product_id.sale_delay or 0)
                 self.write(cr, uid, [container.id], {'etm_date': date_etm.strftime('%Y-%m-%d')}, context=context)
 
+            # Create outgoing pickings from incoming pickings, and confirm all new created pickings
             default = {
                 'state': 'draft',
                 'type': 'out',
@@ -224,11 +239,13 @@ class container_container(osv.osv):
                 copy_ids.append(copy_id)
                 wf_service.trg_validate(uid, 'stock.picking', copy_id, 'button_confirm', cr)
 
+            # Set source and destination location on new outgoing picking's moves
             move_ids = stock_move_obj.search(cr, uid, [('picking_id', 'in', copy_ids)], context=context)
             values = {
                 'location_id': container.container_stock_location_id.id,
                 'location_dest_id': container.destination_warehouse_id and container.destination_warehouse_id.lot_input_id.id,
             }
+            # Update new moves' date from container's market date
             if container.etm_date:
                 values.update({'date': container.etm_date})
 
@@ -240,6 +257,10 @@ class container_container(osv.osv):
         """
         Action lanched when arriving on freight state
         """
+        if context is None:
+            # There is no context in workflow, so get it on user
+            context = self.pool.get('res.users').context_get(cr, uid, context=context)
+
         stock_picking_obj = self.pool.get('stock.picking')
 
         picking_ids = []
@@ -261,6 +282,10 @@ class container_container(osv.osv):
         """
         Action lanched when arriving on clearance state
         """
+        if context is None:
+            # There is no context in workflow, so get it on user
+            context = self.pool.get('res.users').context_get(cr, uid, context=context)
+
         # Error if the date of arrival is in the future
         if [container.id for container in self.browse(cr, uid, ids, context=context) if datetime.datetime.today() < datetime.datetime.strptime(container.eta_date, '%Y-%m-%d')]:
             raise osv.except_osv(_('Warning !'), _('Current date is < Estimated date of arrival !'))
@@ -271,6 +296,10 @@ class container_container(osv.osv):
         """
         Action lanched when arriving on unpacking state
         """
+        if context is None:
+            # There is no context in workflow, so get it on user
+            context = self.pool.get('res.users').context_get(cr, uid, context=context)
+
         # Error if the RDV date is in the past
         if [container.id for container in self.browse(cr, uid, ids, context) if datetime.datetime.today() > datetime.datetime.strptime(container.rda_date.split(' ')[0], '%Y-%m-%d')]:
             raise osv.except_osv(_('Warning !'), _('Current date is > RDV !'))
@@ -281,6 +310,10 @@ class container_container(osv.osv):
         """
         Action lanched when arriving on cancel state
         """
+        if context is None:
+            # There is no context in workflow, so get it on user
+            context = self.pool.get('res.users').context_get(cr, uid, context=context)
+
         for container in self.browse(cr, uid, ids, context=context):
             # Error if one of the incoming pickings is in cancel state
             if [picking.id for picking in container.incoming_picking_list_ids if picking.state != "cancel"]:
@@ -292,6 +325,10 @@ class container_container(osv.osv):
         """
         Action lanched when arriving on delivered state
         """
+        if context is None:
+            # There is no context in workflow, so get it on user
+            context = self.pool.get('res.users').context_get(cr, uid, context=context)
+
         stock_move_obj = self.pool.get('stock.move')
         product_product_obj = self.pool.get('product.product')
         stock_picking_obj = self.pool.get('stock.picking')
@@ -312,10 +349,12 @@ class container_container(osv.osv):
             for out_move in out_move_data:
                 out_product_qty[out_move['product_id'][0]] = out_product_qty.get(out_move['product_id'][0], 0) + out_move['product_qty']
 
+            # Check incoming vs outgoing quantities
             picking = self.check_outgoing_incoming(cr, uid, out_product_qty, in_product_qty, context=context)
             if picking:
                 raise osv.except_osv(_('Warning !'), _('Outgoing packing list product or qty is higher then Incoming packing !'))
 
+            # Create new outgoing picking if there is unused quantity on some products, to store them in the container's warehouse
             picking = self.check_outgoing_incoming(cr, uid, in_product_qty, out_product_qty, context=context)
             if picking:
                 values ={
@@ -325,6 +364,7 @@ class container_container(osv.osv):
                 }
                 picking_id = stock_picking_obj.create(cr, uid, values, context=context)
 
+                # Create moves in the new picking
                 for key, val in picking.items():
                     product = product_product_obj.browse(cr, uid, key, context=context)
                     values = {
@@ -339,8 +379,10 @@ class container_container(osv.osv):
                     }
                     stock_move_obj.create(cr, uid, values, context=context)
 
+                # Confirm the new picking
                 wf_service.trg_validate(uid, 'stock.picking', picking_id, 'button_confirm', cr)
 
+            # Set all outgoing pickings' state to done
             move_ids = [data.id for data in container.outgoing_picking_list_ids]
             stock_picking_obj.action_done(cr, uid, move_ids, context=context)
 
@@ -362,9 +404,14 @@ class container_container(osv.osv):
         """
         Action lanched when arriving on assigned state
         """
+        if context is None:
+            # There is no context in workflow, so get it on user
+            context = self.pool.get('res.users').context_get(cr, uid, context=context)
+
         stock_picking_obj = self.pool.get('stock.picking')
 
         for container in self.browse(cr, uid, ids, context=context):
+            # Assign all incoming pickings
             picking_ids = [data.id for data in container.incoming_picking_list_ids]
             stock_picking_obj.action_assign(cr, uid, picking_ids)
 
