@@ -396,7 +396,9 @@ class container_container(osv.osv):
         picking_prod = {}
 
         for data in picking1:
-            picking_prod[data] = min(max(0, picking1[data] - picking2[data]), picking1[data])
+            diff = min(max(0, picking1[data] - picking2[data]), picking1[data])
+            if diff > 0:
+                picking_prod[data] = diff
 
         return picking_prod
 
@@ -413,7 +415,7 @@ class container_container(osv.osv):
         for container in self.browse(cr, uid, ids, context=context):
             # Assign all incoming pickings
             picking_ids = [data.id for data in container.incoming_picking_list_ids]
-            stock_picking_obj.action_assign(cr, uid, picking_ids)
+            stock_picking_obj.action_assign(cr, uid, picking_ids, context)
 
         return True
 
