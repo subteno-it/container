@@ -419,6 +419,18 @@ class container_container(osv.osv):
 
         return True
 
+    def copy(self, cr, uid, id, default=None, context=None):
+        """
+        Removes some values to avoid creating duplicate pickings
+        """
+
+        default = {
+            'incoming_picking_list_ids': [],
+            'outgoing_picking_list_ids': [],
+        }
+
+        return super(container_container, self).copy(cr, uid, id, default, context=context)
+
 container_container()
 
 # vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:
