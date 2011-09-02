@@ -24,18 +24,14 @@
         #
         ##############################################################################
 
-        <record id="view_sale_order_form" model="ir.ui.view">
-            <field name="name">sale.order.form</field>
-            <field name="model">sale.order</field>
-            <field name="type">form</field>
-            <field name="priority" eval="8"/>
-            <field name="inherit_id" ref="sale.view_order_form"/>
-            <field name="arch" type="xml">
-                <xpath expr="/form/notebook/page/field[@name='order_line']/form/notebook/page/field[@name='product_packaging']" position="after">
-                    <field name="container_id"/>
-                </xpath>
-            </field>
-        </record>
+        #
+        # Products available on containers
+        #
+        <act_window id="act_open_container_stock_available"
+            name="Container stock available"
+            res_model="stock.move"
+            src_model="product.product"
+            domain="[('product_id', '=', active_id), ('sale_line_id', '=', False), ('picking_id', '=', False)]"/>
 
     </data>
 </openerp>

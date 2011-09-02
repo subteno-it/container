@@ -23,6 +23,7 @@
 ##############################################################################
 
 
+import base
 import container
 import sale
 import stock

@@ -27,13 +27,13 @@ from osv import osv
 from osv import fields
 
 
-class stock_move(osv.osv):
-    _inherit = 'stock.move'
+class res_company(osv.osv):
+    _inherit = 'res.company'
 
     _columns = {
-        'container_id': fields.many2one('container.container', 'Container', help='Container of this move'),
+        'container_updates_dates': fields.boolean('Container Updates Dates', help='Check to allow container to update dates on pickings and moves'),
     }
 
-stock_move()
+res_company()
 
 # vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:

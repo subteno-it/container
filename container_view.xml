@@ -40,7 +40,7 @@
                     <field name="etd_date"/>
                     <field name="eta_date"/>
                     <field name="etm_date"/>
-                    <field name="rda_date"/>
+                    <field name="rdv_date"/>
                     <field name="weight"/>
                     <field name="volume"/>
                     <field name="remaining_volume"/>
@@ -58,39 +58,40 @@
             <field name="priority" eval="8"/>
             <field name="arch" type="xml">
                 <form string="Container">
+                    <field name="id" invisible="1"/>
                     <field name="name" select="1"/>
-                    <field name="product_id" select="1"/>
+                    <field name="product_id" select="1" domain="[('categ_id','child_of', %(product_category_container)d)]"/>
                     <field name="partner_id"/>
                     <field name="address_id"/>
                     <field name="sscc" select="1"/>
-                    <field name="prod_serial" select="2"/>
+                    <field name="prod_serial" select="1"/>
                     <notebook colspan="4">
                         <page string="General">
                             <group colspan="2" col="2">
                                 <separator colspan="2" string="Dates"/>
                                 <field name="etd_date" select="1"/>
-                                <field name="eta_date" select="2"/>
-                                <field name="etm_date" select="2"/>
-                                <field name="rda_date" select="1"/>
+                                <field name="eta_date" select="1"/>
+                                <field name="etm_date" select="1"/>
+                                <field name="rdv_date" select="1"/>
                             </group>
                             <group colspan="2" col="2">
                                 <separator colspan="2" string="Location"/>
-                                <field name="container_stock_location_id" select="2"/>
-                                <field name="destination_warehouse_id" select="2"/>
+                                <field name="container_stock_location_id" select="1" domain="[('categ_id','=', %(stock_location_category_container)d)]"/>
+                                <field name="destination_warehouse_id" widget="selection" select="1"/>
                                 <field name="incoterm_id" widget="selection"/>
                             </group>
                             <group colspan="2" col="2">
                                 <separator colspan="2" string="Weight / Volume"/>
                                 <field name="weight" select="1"/>
-                                <field name="volume" select="2"/>
-                                <field name="remaining_volume" select="2"/>
+                                <field name="volume" select="1"/>
+                                <field name="remaining_volume" select="1"/>
                             </group>
                         </page>
-                        <page string="Incoming picking">
-                            <field name="incoming_picking_list_ids" widget="many2many" nolabel="1" colspan="4"/>
+                        <page string="Incoming Moves">
+                            <field name="incoming_move_list_ids" widget="many2many" nolabel="1" colspan="4" attrs="{'readonly': [('id','=', 0)]}" domain="['|', ('container_id', '=', active_id), '&amp;', ('container_id', '=', False), ('picking_id.state', 'not in', ('done', 'cancel'))]"/>
                         </page>
-                        <page string="Outgoing picking">
-                            <field name="outgoing_picking_list_ids" widget="many2many" nolabel="1" colspan="4"/>
+                        <page string="Outgoing Moves">
+                            <field name="outgoing_move_list_ids" widget="many2many" nolabel="1" colspan="4"/>
                         </page>
                     </notebook>
                     <field name="state"/>
@@ -103,7 +104,6 @@
                         <button name="button_approach" string="Approaching" states="clearance" icon="gtk-ok"/>
                         <button name="button_unpack" string="Unpacking" states="approaching" icon="gtk-jump-to"/>
                         <button name="button_deliver" string="Delivered" states="unpacking" icon="gtk-convert"/>
-                        <button name="action_assign" string="Check Availability" states="delivered" type="object" icon="gtk-execute"/>
                     </group>
                 </form>
             </field>
