@@ -88,7 +88,7 @@
                             </group>
                         </page>
                         <page string="Incoming Moves">
-                            <field name="incoming_move_list_ids" context="{'search_view_ref': 'container.view_stock_move_search'}" widget="many2many" nolabel="1" colspan="4" attrs="{'readonly': [('id','=', 0)]}" domain="['|', ('container_id', '=', active_id), '&amp;', ('container_id', '=', False), ('picking_id.state', 'not in', ('done', 'cancel'))]"/>
+                            <field name="incoming_move_list_ids" context="{'search_view_ref': 'container.view_stock_move_search'}" widget="many2many" nolabel="1" colspan="4" attrs="{'readonly': [('id','=', 0)]}" domain="[('picking_id', '=', 'in'), '|', ('container_id', '=', active_id), '&amp;', ('container_id', '=', False), ('picking_id.state', 'not in', ('done', 'cancel'))]"/>
                         </page>
                         <page string="Outgoing Moves">
                             <field name="outgoing_move_list_ids" widget="many2many" nolabel="1" colspan="4"/>
