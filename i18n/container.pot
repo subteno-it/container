@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: OpenERP Server 6.0.2\n"
 "Report-Msgid-Bugs-To: support@openerp.com\n"
-"POT-Creation-Date: 2011-08-26 15:08+0000\n"
-"PO-Revision-Date: 2011-08-26 15:08+0000\n"
+"POT-Creation-Date: 2011-09-05 09:03+0000\n"
+"PO-Revision-Date: 2011-09-05 09:03+0000\n"
 "Last-Translator: <>\n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -30,44 +30,55 @@ msgstr ""
 #: view:container.container:0
 #: model:ir.actions.act_window,name:container.act_open_container_container_view
 #: model:ir.model,name:container.model_container_container
-#: model:ir.module.module,shortdesc:container.module_meta_information
 #: model:ir.ui.menu,name:container.menu_container_container
-#: field:sale.order,container_id:0
-#: field:stock.picking,container_id:0
+#: model:product.category,name:container.product_category_container
+#: view:res.company:0
+#: field:sale.order.line,container_id:0
+#: field:stock.move,container_id:0
 msgid "Container"
 msgstr ""
 
 #. module: container
-#: help:stock.picking,container_id:0
-msgid "Container of this picking"
+#: code:addons/container/container.py:301
+#, python-format
+msgid "Outgoing packing list product or qty is higher then Incoming packing !"
 msgstr ""
 
 #. module: container
-#: help:sale.order,container_id:0
-msgid "Container of this sale order"
+#: constraint:res.company:0
+msgid "Error! You can not create recursive companies."
 msgstr ""
 
 #. module: container
-#: view:container.container:0
-msgid "Check Availability"
+#: help:stock.move,container_id:0
+msgid "Container of this move"
+msgstr ""
+
+#. module: container
+#: field:res.company,container_updates_dates:0
+msgid "Container Updates Dates"
 msgstr ""
 
 #. module: container
 #: code:addons/container/container.py:178
+#: code:addons/container/container.py:180
+#: code:addons/container/container.py:184
+#: code:addons/container/container.py:209
+#: code:addons/container/container.py:266
+#: code:addons/container/container.py:301
 #, python-format
-msgid "You must define container stock location as supplier location !"
+msgid "Warning !"
 msgstr ""
 
 #. module: container
-#: field:container.container,outgoing_picking_list_ids:0
-#: help:container.container,outgoing_picking_list_ids:0
-msgid "Outgoing Picking List"
+#: model:ir.actions.act_window,name:container.act_open_container_stock_available
+msgid "Container stock available"
 msgstr ""
 
 #. module: container
-#: code:addons/container/container.py:250
-#, python-format
-msgid "Current date is < Date of departure !"
+#: view:container.container:0
+#: selection:container.container,state:0
+msgid "Draft"
 msgstr ""
 
 #. module: container
@@ -86,14 +97,8 @@ msgid "Picking List"
 msgstr ""
 
 #. module: container
-#: code:addons/container/container.py:317
-#, python-format
-msgid "Outgoing packing list product or qty is higher then Incoming packing !"
-msgstr ""
-
-#. module: container
-#: view:container.container:0
-msgid "Weight / Volume"
+#: help:sale.order.line,container_id:0
+msgid "Container of this sale order line"
 msgstr ""
 
 #. module: container
@@ -124,22 +129,18 @@ msgid "Order Reference must be unique !"
 msgstr ""
 
 #. module: container
-#: help:container.container,product_id:0
-msgid "The container product"
+#: view:container.container:0
+msgid "Incoming Moves"
 msgstr ""
 
 #. module: container
-#: code:addons/container/container.py:175
-#: code:addons/container/container.py:178
-#: code:addons/container/container.py:181
-#: code:addons/container/container.py:192
-#: code:addons/container/container.py:250
-#: code:addons/container/container.py:266
-#: code:addons/container/container.py:276
-#: code:addons/container/container.py:287
-#: code:addons/container/container.py:317
-#, python-format
-msgid "Warning !"
+#: constraint:stock.move:0
+msgid "You try to assign a lot which is not from the same product"
+msgstr ""
+
+#. module: container
+#: help:container.container,outgoing_move_list_ids:0
+msgid "Outgoing move List"
 msgstr ""
 
 #. module: container
@@ -154,7 +155,7 @@ msgstr ""
 
 #. module: container
 #: view:container.container:0
-msgid "Outgoing picking"
+msgid "Weight / Volume"
 msgstr ""
 
 #. module: container
@@ -163,40 +164,41 @@ msgid "Address whom the container is located, used to retrieve it"
 msgstr ""
 
 #. module: container
-#: model:ir.module.module,description:container.module_meta_information
-msgid "Manages containers receipt"
+#: help:container.container,incoming_move_list_ids:0
+msgid "Incoming move List"
 msgstr ""
 
 #. module: container
-#: help:container.container,rda_date:0
+#: help:container.container,rdv_date:0
 msgid "Date and time at which the transporter will show up at final destination to deliver the container"
 msgstr ""
 
 #. module: container
-#: code:addons/container/container.py:116
+#: help:container.container,sscc:0
+msgid "Serial Shipping Container Code : unique worldwide identifier for shipping units (given by the shipping company at booking). This field should be formatted to 18 numeric character."
+msgstr ""
+
+#. module: container
+#: field:container.container,etm_date:0
+msgid "Estimated time to market"
+msgstr ""
+
+#. module: container
+#: code:addons/container/sale.py:72
 #, python-format
-msgid "Date of departure %s < %s of planned date of stock move !"
+msgid "%s\n"
+"Not enough quantity in selected container"
 msgstr ""
 
 #. module: container
-#: help:container.container,volume:0
-msgid "The total GROSS volume of all products listed in incoming picking lists of the container"
+#: help:container.container,remaining_volume:0
+msgid "The substraction of the container product gross volume minus the total GROSS volume of all products listed in incoming move lists of the container"
 msgstr ""
 
 #. module: container
-#: view:container.container:0
-#: selection:container.container,state:0
-msgid "Unpacking"
-msgstr ""
-
-#. module: container
-#: help:container.container,partner_id:0
-msgid "Partner whom shipping container"
-msgstr ""
-
-#. module: container
-#: help:container.container,state:0
-msgid "State of the container"
+#: code:addons/container/container.py:184
+#, python-format
+msgid "Remaining volume must be positive !"
 msgstr ""
 
 #. module: container
@@ -205,7 +207,7 @@ msgid "Dates"
 msgstr ""
 
 #. module: container
-#: field:container.container,rda_date:0
+#: field:container.container,rdv_date:0
 msgid "RDV"
 msgstr ""
 
@@ -215,20 +217,39 @@ msgid "Name"
 msgstr ""
 
 #. module: container
-#: help:container.container,sscc:0
-msgid "Serial Shipping Container Code : unique worldwide identifier for shipping units (given by the shipping company at booking). This field should be formatted to 18 numeric character."
+#: help:container.container,volume:0
+msgid "The total GROSS volume of all products listed in incoming move lists of the container"
 msgstr ""
 
 #. module: container
-#: code:addons/container/container.py:276
-#, python-format
-msgid "Current date is > RDV !"
+#: field:container.container,outgoing_move_list_ids:0
+msgid "Outgoing Move List"
 msgstr ""
 
 #. module: container
-#: code:addons/container/container.py:175
+#: view:container.container:0
+msgid "Outgoing Moves"
+msgstr ""
+
+#. module: container
+#: model:ir.model,name:container.model_res_company
+msgid "Companies"
+msgstr ""
+
+#. module: container
+#: help:container.container,weight:0
+msgid "The total weight of all products listed in incoming move lists of the container"
+msgstr ""
+
+#. module: container
+#: code:addons/container/container.py:178
 #, python-format
 msgid "You must define container stock location as company location !"
+msgstr ""
+
+#. module: container
+#: constraint:stock.move:0
+msgid "You must assign a production lot for this product"
 msgstr ""
 
 #. module: container
@@ -237,9 +258,15 @@ msgid "Container Stock Location"
 msgstr ""
 
 #. module: container
-#: code:addons/container/container.py:116
+#: code:addons/container/container.py:209
 #, python-format
-msgid "Error!"
+msgid "Some incoming move is in a done or cancel state picking !"
+msgstr ""
+
+#. module: container
+#: code:addons/container/container.py:180
+#, python-format
+msgid "You must define container stock location as supplier location !"
 msgstr ""
 
 #. module: container
@@ -254,8 +281,8 @@ msgid "Serial number of the product"
 msgstr ""
 
 #. module: container
-#: field:container.container,volume:0
-msgid "Volume"
+#: help:container.container,product_id:0
+msgid "The container product"
 msgstr ""
 
 #. module: container
@@ -270,8 +297,9 @@ msgid "Clearance"
 msgstr ""
 
 #. module: container
-#: help:container.container,weight:0
-msgid "The total weight of all products listed in incoming picking lists of the container"
+#: code:addons/container/sale.py:72
+#, python-format
+msgid "Not enough quantity"
 msgstr ""
 
 #. module: container
@@ -287,14 +315,19 @@ msgid "Approaching"
 msgstr ""
 
 #. module: container
-#: code:addons/container/container.py:192
-#, python-format
-msgid "Some Incoming packing list is in done or cancel state !"
+#: help:container.container,state:0
+msgid "State of the container"
 msgstr ""
 
 #. module: container
-#: help:container.container,remaining_volume:0
-msgid "The substraction of the container product gross volume minus the total GROSS volume of all products listed in incoming picking lists of the container"
+#: field:container.container,volume:0
+msgid "Volume"
+msgstr ""
+
+#. module: container
+#: view:container.container:0
+#: selection:container.container,state:0
+msgid "Unpacking"
 msgstr ""
 
 #. module: container
@@ -308,15 +341,14 @@ msgid "Weight"
 msgstr ""
 
 #. module: container
-#: code:addons/container/container.py:287
-#, python-format
-msgid "Incoming or outgoing packing list not in cancel state !"
+#: model:ir.model,name:container.model_stock_move
+msgid "Stock Move"
 msgstr ""
 
 #. module: container
-#: field:container.container,incoming_picking_list_ids:0
-#: help:container.container,incoming_picking_list_ids:0
-msgid "Incoming Picking List"
+#: code:addons/container/container.py:266
+#, python-format
+msgid "Incoming or outgoing packing list not in cancel state !"
 msgstr ""
 
 #. module: container
@@ -335,15 +367,18 @@ msgid "SSCC"
 msgstr ""
 
 #. module: container
-#: code:addons/container/container.py:181
-#, python-format
-msgid "Remaining volume must be positive !"
+#: help:res.company,container_updates_dates:0
+msgid "Check to allow container to update dates on pickings and moves"
 msgstr ""
 
 #. module: container
-#: code:addons/container/container.py:266
-#, python-format
-msgid "Current date is < Estimated date of arrival !"
+#: field:container.container,incoming_move_list_ids:0
+msgid "Incoming Move List"
+msgstr ""
+
+#. module: container
+#: help:container.container,partner_id:0
+msgid "Partner whom shipping container"
 msgstr ""
 
 #. module: container
@@ -354,19 +389,8 @@ msgstr ""
 
 #. module: container
 #: view:container.container:0
-msgid "Incoming picking"
-msgstr ""
-
-#. module: container
-#: view:container.container:0
 #: selection:container.container,state:0
 msgid "Cancel"
-msgstr ""
-
-#. module: container
-#: view:container.container:0
-#: selection:container.container,state:0
-msgid "Draft"
 msgstr ""
 
 #. module: container
@@ -385,7 +409,7 @@ msgid "Estimated date products available for delivery to customer"
 msgstr ""
 
 #. module: container
-#: field:container.container,etm_date:0
-msgid "Estimated time to market"
+#: model:ir.model,name:container.model_sale_order_line
+msgid "Sales Order Line"
 msgstr ""
 
