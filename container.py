@@ -140,10 +140,22 @@ class container_container(osv.osv):
         for container in self.browse(cr, uid, ids, context=context):
             # Write new dates on container
             new_dates = self.get_dates_from_moves(cr, uid, container.id, context=context)
-            values['etd_date'] = values['etd_date'] or container.etd_date or new_dates['etd_date'],
-            values['eta_date'] = values['eta_date'] or container.eta_date or new_dates['eta_date'],
-            values['etm_date'] = values['etm_date'] or container.etm_date or new_dates['etm_date'],
-            values['rdv_date'] = values['rdv_date'] or container.rdv_date or new_dates['rdv_date'],
+
+            etd_date = values.get('etd_date', False) or container.etd_date or new_dates.get('etd_date', False)
+            if etd_date:
+                values['etd_date'] = etd_date,
+
+            eta_date = values.get('eta_date', False) or container.eta_date or new_dates.get('eta_date', False)
+            if eta_date:
+                values['eta_date'] = eta_date,
+
+            etm_date = values.get('etm_date', False) or container.etm_date or new_dates.get('etm_date', False)
+            if etm_date:
+                values['etm_date'] = etm_date,
+
+            rdv_date = values.get('rdv_date', False) or container.rdv_date or new_dates.get('rdv_date', False)
+            if rdv_date:
+                values['rdv_date'] = rdv_date,
 
             res = super(container_container, self).write(cr, uid, ids, values, context=context)
 
