@@ -48,6 +48,7 @@
         'container_view.xml',
         'product_view.xml',
         'sale_view.xml',
+        'stock_view.xml',
     ],
     'demo_xml': [],
     'test': [],
