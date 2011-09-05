@@ -68,7 +68,7 @@ class sale_order_line(osv.osv):
             # Retrieve quantity available in container
             stock_move_ids = stock_move_obj.search(cr, uid, [('picking_id', '=', False), ('container_id', '=', data['container_id'][0]), ('sale_line_id', '=', False), ('product_id', '=', data['product_id'][0])], context=context)
             stock_move_data = stock_move_obj.read(cr, uid, stock_move_ids, ['product_qty', 'move_dest_id'], context=context)
-            if sum([move_data['product_qty'] for move_data in stock_move_data]) <= data['product_uom_qty']:
+            if sum([move_data['product_qty'] for move_data in stock_move_data]) < data['product_uom_qty']:
                 raise osv.except_osv(_('Not enough quantity'), _('%s\nNot enough quantity in selected container') % data['product_id'][1])
 
             # Reserve products in container
@@ -85,6 +85,10 @@ class sale_order_line(osv.osv):
                     # Update his move_dest_id
                     stock_move_obj.copy(cr, uid, move_data['move_dest_id'][0], {'product_qty': -rest}, context=None)
                     stock_move_obj.write(cr, uid, [move_data['move_dest_id'][0]], {'product_qty': qty_to_reserve, 'move_dest_id': data['move_ids'] and data['move_ids'][0]}, context=context)
+
+                else:
+                    # Update the move_dest_id of the move
+                    stock_move_obj.write(cr, uid, [move_data['move_dest_id'][0]], {'move_dest_id': data['move_ids'] and data['move_ids'][0]}, context=context)
 
                 # Set the sale_line_id on the move
                 stock_move_obj.write(cr, uid, [move_data['id']], {'sale_line_id': data['id']}, context=context)
