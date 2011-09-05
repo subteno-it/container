@@ -117,7 +117,7 @@ class container_container(osv.osv):
 
         # Compute dates values
         date_etm = max(moves_list)
-        eta_date = date_etm - timedelta(container.product_id.product_delay or 0)
+        eta_date = date_etm - timedelta(container.product_id.produce_delay or 0)
         etd_date = date_etm - timedelta(container.product_id.sale_delay or 0)
         # Set container's default dates
         values = {
@@ -133,24 +133,28 @@ class container_container(osv.osv):
         """
         Write method
         """
-        stock_picking_obj = self.pool.get('stock.picking')
-        stock_move_obj = self.pool.get('stock.move')
         res_users_obj = self.pool.get('res.users')
-
-        res = super(container_container, self).write(cr, uid, ids, values, context=context)
 
         company = res_users_obj.browse(cr, uid, uid, context=context).company_id
 
-        if company.container_updates_dates:
-            for container in self.browse(cr, uid, ids, context=context):
-                # Write new dates on container
-                new_dates = self.get_dates_from_moves(cr, uid, container.id, context=context)
-                values.update(new_dates)
+        for container in self.browse(cr, uid, ids, context=context):
+            # Write new dates on container
+            new_dates = self.get_dates_from_moves(cr, uid, container.id, context=context)
+            values['etd_date'] = values['etd_date'] or container.etd_date or new_dates['etd_date'],
+            values['eta_date'] = values['eta_date'] or container.eta_date or new_dates['eta_date'],
+            values['etm_date'] = values['etm_date'] or container.etm_date or new_dates['etm_date'],
+            values['rdv_date'] = values['rdv_date'] or container.rdv_date or new_dates['rdv_date'],
 
+            res = super(container_container, self).write(cr, uid, ids, values, context=context)
+
+            if company.container_updates_dates:
                 # Adjusts dates on moves
-                if container.state != 'draft' or values.get('state', False) != 'draft':
+                if values.get('state', container.state) != 'draft':
+                    stock_move_obj = self.pool.get('stock.move')
+                    stock_picking_obj = self.pool.get('stock.picking')
+
                     move_ids = [move.id for move in container.outgoing_move_list_ids]
-                    stock_move_obj.write(cr, uid, move_ids, {'date': values.get('etd_date', container.etd_date)}, context=context)
+                    stock_move_obj.write(cr, uid, move_ids, {'date': values.get('etm_date', container.etm_date)}, context=context)
 
                     # Search pickings to update their planned date
                     stock_move_data = stock_move_obj.read(cr, uid, move_ids, ['picking_id'], context=context)
@@ -159,6 +163,16 @@ class container_container(osv.osv):
                         new_date = max([datetime.strptime(move.date, '%Y-%m-%d %H:%M:%S') for move in picking.move_lines])
                         picking.write({'min_date': new_date.strftime('%Y-%m-%d')})
 
+        return res
+
+    def unlink(self, cr, uid, ids, context=None):
+        """
+        Disable Container deletion when not in draft
+        """
+        if [container.id for container in self.browse(cr, uid, ids, context=context) if container.state == 'draft']:
+            raise osv.except_osv(_('Error'), _('A container must be in state draft to be deleted !'))
+
+        res = super(container_container, self).unlink(cr, uid, ids, context=context)
         return res
 
     def action_booking(self, cr, uid, ids, context=None):
@@ -190,9 +204,6 @@ class container_container(osv.osv):
                 'container_id': container.id,
                 'location_dest_id': container.container_stock_location_id.id,
             }
-            # Update new moves' date from container's market date
-            if container.etm_date:
-                default.update({'date': container.etm_date})
             copy_ids = []
             for move in container.incoming_move_list_ids:
                 default['move_dest_id'] = move.id
