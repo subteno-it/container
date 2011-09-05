@@ -183,28 +183,11 @@ class container_container(osv.osv):
             if container.remaining_volume < 0:
                 raise osv.except_osv(_('Warning !'), _('Remaining volume must be positive !'))
 
-            # Read incoming move list
-            move_ids = [move.id for move in container.incoming_move_list_ids]
-
-            # Changes incoming moves' location to container's location
-            stock_move_obj.write(cr, uid, move_ids, {'location_dest_id': container.container_stock_location_id.id}, context=context)
-            if stock_move_obj.search(cr, uid, [('id', 'in', move_ids), ('picking_id.state', 'in', ('done', 'cancel'))], context=context):
-                raise osv.except_osv(_('Warning !'), _('Some incoming move is in a done or cancel state picking !'))
-
-            # Confirm all incoming pickings
-            picking_ids = [move.picking_id.id for move in container.incoming_move_list_ids]
-            picking_ids = list(set(picking_ids))
-            for picking_id in picking_ids:
-                wf_service.trg_validate(uid, 'stock.picking', picking_id, 'button_confirm', cr)
-
-            container.write({}, context=context)
-
             # Create outgoing moves from incoming moves
             default = {
                 'state': 'draft',
                 'picking_id': False,
                 'container_id': container.id,
-                'location_id': container.destination_warehouse_id and container.destination_warehouse_id.lot_input_id.id,
                 'location_dest_id': container.container_stock_location_id.id,
             }
             # Update new moves' date from container's market date
@@ -217,8 +200,21 @@ class container_container(osv.osv):
                 new_move_id = stock_move_obj.copy(cr, uid, move.id, default, context=context)
                 copy_ids.append(new_move_id)
 
-                # Set the new move as move_dest_id of the original move and update the destination location
-                move.write({'location_id': container.container_stock_location_id.id}, context=context)
+            # Read incoming move list
+            move_ids = [move.id for move in container.incoming_move_list_ids]
+
+            # Changes incoming moves' location to container's location
+            stock_move_obj.write(cr, uid, move_ids, {'location_id': container.container_stock_location_id.id}, context=context)
+            if stock_move_obj.search(cr, uid, [('id', 'in', move_ids), ('picking_id.state', 'in', ('done', 'cancel'))], context=context):
+                raise osv.except_osv(_('Warning !'), _('Some incoming move is in a done or cancel state picking !'))
+
+            # Confirm all incoming pickings
+            picking_ids = [move.picking_id.id for move in container.incoming_move_list_ids]
+            picking_ids = list(set(picking_ids))
+            for picking_id in picking_ids:
+                wf_service.trg_validate(uid, 'stock.picking', picking_id, 'button_confirm', cr)
+
+            container.write({}, context=context)
 
         return True
 
