@@ -92,10 +92,15 @@ class container_container(osv.osv):
         'destination_warehouse_id': fields.many2one('stock.warehouse', 'Destination Warehouse', required=True,
                                                     states={'cancel': [('readonly', True)], 'delivered': [('readonly', True)]},
                                                     help='Warehouse destination of the container\'s contents'),
-        'incoming_move_list_ids': fields.one2many('stock.move', 'container_id', 'Incoming Move List', domain=[('picking_id.type', '=', 'in')], readonly=True,
-                                                     states={'draft': [('readonly', False)]},
-                                                     help='Incoming move List'),
-        'outgoing_move_list_ids': fields.one2many('stock.move', 'container_id', 'Outgoing Move List', domain=[('picking_id', '=', False)], readonly=True, help='Outgoing move List'),
+        #'incoming_move_list_ids': fields.one2many('stock.move', 'container_id', 'Incoming Move List', domain=[('picking_id.type', '=', 'in'), ('picking_id.state', 'not in', ('done', 'cancel'))], readonly=True,
+        #                                             states={'draft': [('readonly', False)]},
+        #                                             help='Incoming move List'),
+        'incoming_move_list_ids': fields.many2many('stock.move', 'container_move_rel', 'container_id', 'move_id', 'Incoming Shipments',
+                                                   domain=[('picking_id.type', '=', 'in'),('container_id', '=', False),('picking_id.state', 'not in', ('done', 'cancel'))],
+                                                   readonly=True,
+                                                   states={'draft': [('readonly', False)]},
+                                                  ),
+        'line_ids': fields.one2many('stock.move', 'container_id', 'Outgoing Move List', readonly=True, help='Stock Moves'),
         'state': fields.selection([('draft', 'Draft'),
                                    ('booking', 'Booking'),
                                    ('freight', 'Freight'),
@@ -126,7 +131,7 @@ class container_container(osv.osv):
         container = self.browse(cr, uid, container_id, context=context)
 
         # Get the highest date of the moves
-        moves_list = [datetime.strptime(move.date, '%Y-%m-%d %H:%M:%S') for move in container.outgoing_move_list_ids]
+        moves_list = [datetime.strptime(move.date, '%Y-%m-%d %H:%M:%S') for move in container.line_ids]
         if not moves_list:
             return {}
 
@@ -180,7 +185,7 @@ class container_container(osv.osv):
                     stock_move_obj = self.pool.get('stock.move')
                     stock_picking_obj = self.pool.get('stock.picking')
 
-                    move_ids = [move.id for move in container.outgoing_move_list_ids]
+                    move_ids = [move.id for move in container.line_ids]
                     stock_move_obj.write(cr, uid, move_ids, {'date': values.get('etm_date', container.etm_date)}, context=context)
 
                     # Search pickings to update their planned date
@@ -202,6 +207,20 @@ class container_container(osv.osv):
         res = super(container_container, self).unlink(cr, uid, ids, context=context)
         return res
 
+    def action_draft(self, cr, uid, ids, context=None):
+        """
+        Action lanched when the user want to revert in draft
+        """
+
+        for container in self.browse(cr, uid, ids, context=context):
+            # Chek if the user filled picking in in this container before booking
+            if container.line_ids:
+                # Read incoming move list
+                move_ids = [move.id for move in container.line_ids]
+                self.pool.get('stock.move').unlink(cr, uid, move_ids, context=context)
+
+        return True
+
     def action_booking(self, cr, uid, ids, context=None):
         """
         Action lanched when arriving on booking state
@@ -211,7 +230,6 @@ class container_container(osv.osv):
             context = self.pool.get('res.users').context_get(cr, uid, context=context)
 
         stock_move_obj = self.pool.get('stock.move')
-        wf_service = netsvc.LocalService('workflow')
 
         for container in self.browse(cr, uid, ids, context=context):
             # Check container's location
@@ -220,12 +238,16 @@ class container_container(osv.osv):
             #elif container.incoterm_id.code in ['DAF', 'DES', 'DES', 'DDU', 'DDP'] and container.container_stock_location_id.usage != 'supplier':
             #    raise osv.except_osv(_('Warning !'), _('You must define container stock location as supplier location !'))
             # In version 6, we must have the stock location in internal else impossible to create invoice supplier
-            if container.container_stock_location_id.usage != 'internal':
-                raise osv.except_osv(_('Warning !'), _('You must define container stock location as internal location !'))
+            if container.container_stock_location_id.usage != 'supplier':
+                raise osv.except_osv(_('Warning !'), _('You must define container stock location as supplier location !'))
 
             # Check remaining volume
             if container.remaining_volume < 0:
                 raise osv.except_osv(_('Warning !'), _('Remaining volume must be positive !'))
+
+            # Chek if the user filled picking in in this container before booking
+            if not container.incoming_move_list_ids:
+                raise osv.except_osv(_('Warning !'), _('You must select incoming shipmets before booking !'))
 
             # Create outgoing moves from incoming moves
             default = {
@@ -234,28 +256,16 @@ class container_container(osv.osv):
                 'container_id': container.id,
                 'location_dest_id': container.container_stock_location_id.id,
             }
-            copy_ids = []
             for move in container.incoming_move_list_ids:
                 default['move_dest_id'] = move.id
                 # Create the new move
                 new_move_id = stock_move_obj.copy(cr, uid, move.id, default, context=context)
-                copy_ids.append(new_move_id)
 
             # Read incoming move list
             move_ids = [move.id for move in container.incoming_move_list_ids]
 
             # Changes incoming moves' location to container's location
             stock_move_obj.write(cr, uid, move_ids, {'location_id': container.container_stock_location_id.id}, context=context)
-            if stock_move_obj.search(cr, uid, [('id', 'in', move_ids), ('picking_id.state', 'in', ('done', 'cancel'))], context=context):
-                raise osv.except_osv(_('Warning !'), _('Some incoming move is in a done or cancel state picking !'))
-
-            # Confirm all incoming pickings
-            picking_ids = [move.picking_id.id for move in container.incoming_move_list_ids]
-            picking_ids = list(set(picking_ids))
-            for picking_id in picking_ids:
-                wf_service.trg_validate(uid, 'stock.picking', picking_id, 'button_confirm', cr)
-
-            container.write({}, context=context)
 
         return True
 
@@ -267,17 +277,15 @@ class container_container(osv.osv):
             # There is no context in workflow, so get it on user
             context = self.pool.get('res.users').context_get(cr, uid, context=context)
 
-        stock_picking_obj = self.pool.get('stock.picking')
+        stock_move_obj = self.pool.get('stock.move')
 
-        picking_ids = []
+        move_ids = []
 
         for container in self.browse(cr, uid, ids, context=context):
-            # Add picking ids in the list
-            picking_ids.extend([move.picking_id.id for move in container.incoming_move_list_ids])
+            # Add move ids in the list
+            move_ids.extend([move.id for move in container.line_ids])
 
-        # Picking are now done
-        # TODO : Call workflow instead of directly action_done ?
-        stock_picking_obj.action_done(cr, uid, picking_ids, context=context)
+        stock_move_obj.action_done(cr, uid, move_ids, context=context)
 
         return True
 
@@ -361,7 +369,7 @@ class container_container(osv.osv):
                     stock_move_obj.create(cr, uid, values, context=context)
 
             # Set all outgoing pickings' state to done
-            move_ids = [move.id for move in container.outgoing_move_list_ids]
+            move_ids = [move.id for move in container.line_ids]
             stock_move_obj.action_done(cr, uid, move_ids, context=context)
 
         return True
@@ -387,7 +395,7 @@ class container_container(osv.osv):
 
         default = {
             'incoming_move_list_ids': [],
-            'outgoing_move_list_ids': [],
+            'line_ids': [],
         }
 
         return super(container_container, self).copy(cr, uid, id, default, context=context)

@@ -41,7 +41,8 @@
             <field name="flow_start">True</field>
             <field name="name">draft</field>
             <field name="kind">function</field>
-            <field name="action">write({'state': 'draft'})</field>
+            <field name="action">action_draft()
+write({'state': 'draft'})</field>
         </record>
         <record id="wkf_act_booking" model="workflow.activity">
             <field name="wkf_id" ref="wkf_container"/>

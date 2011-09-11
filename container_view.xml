@@ -87,11 +87,30 @@
                                 <field name="remaining_volume" select="1"/>
                             </group>
                         </page>
-                        <page string="Incoming Moves">
-                            <field name="incoming_move_list_ids" context="{'search_view_ref': 'container.view_stock_move_search'}" widget="many2many" nolabel="1" colspan="4" attrs="{'readonly': [('id','=', 0)]}" domain="[('picking_id.type', '=', 'in'), '|', ('container_id', '=', active_id), '&amp;', ('container_id', '=', False), ('picking_id.state', 'not in', ('done', 'cancel'))]"/>
+                        <page string="Incoming Shipments">
+                            <field name="incoming_move_list_ids" nolabel="1" colspan="4">
+                                <tree colors="grey:state in ('cancel');red:current_date > date" string="Moves">
+                                    <field name="name" readonly="1"/>
+                                    <field name="picking_id" string="Reference" readonly="1"/>
+                                    <field name="origin" readonly="1"/>
+                                    <field name="partner_id" readonly="1"/>
+                                    <field name="product_id" readonly="1"/>
+                                    <field name="product_qty" on_change="onchange_quantity(product_id, product_qty, product_uom, product_uos)" readonly="1"/>
+                                    <field name="product_uom" string="UoM" readonly="1"/>
+                                    <field name="product_uos" groups="product.group_uos" readonly="1"/>
+                                    <field name="prodlot_id" groups="base.group_extended" readonly="1"/>
+                                    <field groups="base.group_extended" name="tracking_id" readonly="1"/>
+                                    <field name="location_id" readonly="1"/>
+                                    <field name="location_dest_id" readonly="1"/>
+                                    <field name="date" readonly="1"/>
+                                    <field name="date_expected" readonly="1"/>
+                                    <field name="state" readonly="1"/>
+                                </tree>
+                            </field>
                         </page>
-                        <page string="Outgoing Moves">
-                            <field name="outgoing_move_list_ids" widget="many2many" nolabel="1" colspan="4"/>
+                        <page string="Stock Moves">
+                            <field name="line_ids" nolabel="1" colspan="4"/>
+                            <button name="%(stock.action_partial_move_server)d" string="Partial" type="action" states="booking" icon="gtk-justify-fill"/>
                         </page>
                     </notebook>
                     <field name="state"/>
