@@ -49,6 +49,7 @@
         'product_view.xml',
         'sale_view.xml',
         'stock_view.xml',
+        'wizard/stock_partial_container_view.xml',
     ],
     'demo_xml': [],
     'test': [],

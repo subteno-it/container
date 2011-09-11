@@ -109,7 +109,7 @@
                             </field>
                         </page>
                         <page string="Stock Moves">
-                            <field name="line_ids" nolabel="1" colspan="4"/>
+                            <field name="move_line_ids" nolabel="1" colspan="4"/>
                             <button name="%(stock.action_partial_move_server)d" string="Partial" type="action" states="booking" icon="gtk-justify-fill"/>
                         </page>
                     </notebook>
@@ -118,7 +118,7 @@
                         <button name="button_cancel" string="Cancel" states="booking,freight,clearance,approaching,unpacking,draft" icon="gtk-cancel"/>
                         <button name="button_draft" string="Draft" states="cancel,booking" icon="gtk-new"/>
                         <button name="button_booking" string="Booking" states="draft" icon="gtk-execute"/>
-                        <button name="button_freight" string="Freight" states="booking" icon="gtk-go-forward"/>
+                        <button name="action_freight" string="Freight" states="booking" type="object" icon="gtk-go-forward"/>
                         <button name="button_clearance" string="Clearance" states="freight" icon="gtk-media-pause"/>
                         <button name="button_approach" string="Approaching" states="clearance" icon="gtk-ok"/>
                         <button name="button_unpack" string="Unpacking" states="approaching" icon="gtk-jump-to"/>

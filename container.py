@@ -97,7 +97,7 @@ class stock_container(osv.osv):
                                                    readonly=True,
                                                    states={'draft': [('readonly', False)]},
                                                   ),
-        'line_ids': fields.one2many('stock.move', 'container_id', 'Outgoing Move List', readonly=True, help='Stock Moves'),
+        'move_line_ids': fields.one2many('stock.move', 'container_id', 'Outgoing Move List', readonly=True, help='Stock Moves'),
         'state': fields.selection([('draft', 'Draft'),
                                    ('booking', 'Booking'),
                                    ('freight', 'Freight'),
@@ -128,7 +128,7 @@ class stock_container(osv.osv):
         container = self.browse(cr, uid, container_id, context=context)
 
         # Get the highest date of the moves
-        moves_list = [datetime.strptime(move.date, '%Y-%m-%d %H:%M:%S') for move in container.line_ids]
+        moves_list = [datetime.strptime(move.date, '%Y-%m-%d %H:%M:%S') for move in container.move_line_ids]
         if not moves_list:
             return {}
 
@@ -182,7 +182,7 @@ class stock_container(osv.osv):
                     stock_move_obj = self.pool.get('stock.move')
                     stock_picking_obj = self.pool.get('stock.picking')
 
-                    move_ids = [move.id for move in container.line_ids]
+                    move_ids = [move.id for move in container.move_line_ids]
                     stock_move_obj.write(cr, uid, move_ids, {'date': values.get('etm_date', container.etm_date)}, context=context)
 
                     # Search pickings to update their planned date
@@ -211,10 +211,9 @@ class stock_container(osv.osv):
 
         for container in self.browse(cr, uid, ids, context=context):
             # Chek if the user filled picking in in this container before booking
-            print container.line_ids
-            if container.line_ids:
+            if container.move_line_ids:
                 # Read incoming move list
-                move_ids = [move.id for move in container.line_ids]
+                move_ids = [move.id for move in container.move_line_ids]
                 self.pool.get('stock.move').unlink(cr, uid, move_ids, context=context)
 
         return True
@@ -272,28 +271,16 @@ class stock_container(osv.osv):
         Action lanched when arriving on freight state
         """
         if context is None:
-            # There is no context in workflow, so get it on user
-            context = self.pool.get('res.users').context_get(cr, uid, context=context)
+            context = {}
 
-        #stock_move_obj = self.pool.get('stock.move')
-
-        #move_ids = []
-
-        #for container in self.browse(cr, uid, ids, context=context):
-        #    # Add move ids in the list
-        #    move_ids.extend([move.id for move in container.line_ids])
-
-        #stock_move_obj.action_done(cr, uid, move_ids, context=context)
-
-        #return True
-        partial_id = self.pool.get("container.partial.picking").create(
+        partial_id = self.pool.get("stock.partial.container").create(
             cr, uid, {}, context=dict(context, active_ids=ids))
         return {
             'name':_("Products to Process"),
             'view_mode': 'form',
             'view_id': False,
             'view_type': 'form',
-            'res_model': 'container.partial.picking',
+            'res_model': 'stock.partial.container',
             'res_id': partial_id,
             'type': 'ir.actions.act_window',
             'nodestroy': True,
@@ -382,7 +369,7 @@ class stock_container(osv.osv):
                     stock_move_obj.create(cr, uid, values, context=context)
 
             # Set all outgoing pickings' state to done
-            move_ids = [move.id for move in container.line_ids]
+            move_ids = [move.id for move in container.move_line_ids]
             stock_move_obj.action_done(cr, uid, move_ids, context=context)
 
         return True
@@ -408,7 +395,7 @@ class stock_container(osv.osv):
 
         default = {
             'incoming_move_list_ids': [],
-            'line_ids': [],
+            'move_line_ids': [],
         }
 
         return super(stock_container, self).copy(cr, uid, id, default, context=context)

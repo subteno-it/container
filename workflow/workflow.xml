@@ -55,8 +55,7 @@ write({'state': 'booking'})</field>
             <field name="wkf_id" ref="wkf_container"/>
             <field name="name">freight</field>
             <field name="kind">function</field>
-            <field name="action">action_freight()
-write({'state': 'freight'})</field>
+            <field name="action">write({'state': 'freight'})</field>
         </record>
         <record id="wkf_act_clearance" model="workflow.activity">
             <field name="wkf_id" ref="wkf_container"/>
