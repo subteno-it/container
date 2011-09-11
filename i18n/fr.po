@@ -16,21 +16,21 @@ msgstr ""
 "Plural-Forms: \n"
 
 #. module: container
-#: view:container.container:0
-#: selection:container.container,state:0
+#: view:stock.container:0
+#: selection:stock.container,state:0
 msgid "Delivered"
 msgstr "Délivré"
 
 #. module: container
-#: field:container.container,remaining_volume:0
+#: field:stock.container,remaining_volume:0
 msgid "Remaining Volume"
 msgstr "Volume libre"
 
 #. module: container
-#: view:container.container:0
-#: model:ir.actions.act_window,name:container.act_open_container_container_view
-#: model:ir.model,name:container.model_container_container
-#: model:ir.ui.menu,name:container.menu_container_container
+#: view:stock.container:0
+#: model:ir.actions.act_window,name:container.act_open_stock_container_view
+#: model:ir.model,name:container.model_stock_container
+#: model:ir.ui.menu,name:container.menu_stock_container
 #: model:product.category,name:container.product_category_container
 #: view:res.company:0
 #: field:sale.order.line,container_id:0
@@ -39,7 +39,7 @@ msgid "Container"
 msgstr "Conteneur"
 
 #. module: container
-#: code:addons/container/container.py:301
+#: code:addons/stock.container.py:301
 #, python-format
 msgid "Outgoing packing list product or qty is higher then Incoming packing !"
 msgstr "La quantité de produits sortants est supérieure à la quantité entrante !"
@@ -60,12 +60,12 @@ msgid "Container Updates Dates"
 msgstr "Le conteneur met les dates à jour"
 
 #. module: container
-#: code:addons/container/container.py:178
-#: code:addons/container/container.py:180
-#: code:addons/container/container.py:184
-#: code:addons/container/container.py:209
-#: code:addons/container/container.py:266
-#: code:addons/container/container.py:301
+#: code:addons/stock.container.py:178
+#: code:addons/stock.container.py:180
+#: code:addons/stock.container.py:184
+#: code:addons/stock.container.py:209
+#: code:addons/stock.container.py:266
+#: code:addons/stock.container.py:301
 #, python-format
 msgid "Warning !"
 msgstr "Attention !"
@@ -76,18 +76,18 @@ msgid "Container stock available"
 msgstr "Stock disponible dans le conteneur"
 
 #. module: container
-#: view:container.container:0
-#: selection:container.container,state:0
+#: view:stock.container:0
+#: selection:stock.container,state:0
 msgid "Draft"
 msgstr "Brouillon"
 
 #. module: container
-#: view:container.container:0
+#: view:stock.container:0
 msgid "Location"
 msgstr "Emplacement"
 
 #. module: container
-#: field:container.container,partner_id:0
+#: field:stock.container,partner_id:0
 msgid "Freight Broker"
 msgstr "Transitaire"
 
@@ -102,24 +102,24 @@ msgid "Container of this sale order line"
 msgstr "Conteneur de cette ligne de commande"
 
 #. module: container
-#: view:container.container:0
-#: selection:container.container,state:0
+#: view:stock.container:0
+#: selection:stock.container,state:0
 msgid "Booking"
 msgstr "Enregistrement"
 
 #. module: container
-#: field:container.container,state:0
+#: field:stock.container,state:0
 msgid "Status"
 msgstr "État"
 
 #. module: container
-#: field:container.container,incoterm_id:0
-#: help:container.container,incoterm_id:0
+#: field:stock.container,incoterm_id:0
+#: help:stock.container,incoterm_id:0
 msgid "Incoterm"
 msgstr "Incoterm"
 
 #. module: container
-#: field:container.container,product_id:0
+#: field:stock.container,product_id:0
 msgid "Product"
 msgstr "Produit"
 
@@ -129,7 +129,7 @@ msgid "Order Reference must be unique !"
 msgstr "La référence de la commande doit être unique !"
 
 #. module: container
-#: view:container.container:0
+#: view:stock.container:0
 msgid "Incoming Moves"
 msgstr "Mouvements entrants"
 
@@ -139,47 +139,47 @@ msgid "You try to assign a lot which is not from the same product"
 msgstr "Vous essayez d'attribuer un lot qui n'est pas du même produit"
 
 #. module: container
-#: help:container.container,outgoing_move_list_ids:0
+#: help:stock.container,outgoing_move_list_ids:0
 msgid "Outgoing move List"
 msgstr "Liste de mouvements sortants"
 
 #. module: container
-#: help:container.container,container_stock_location_id:0
+#: help:stock.container,container_stock_location_id:0
 msgid "Stck location of the container's contents"
 msgstr "Emplacement de stock du conteneur"
 
 #. module: container
-#: help:container.container,name:0
+#: help:stock.container,name:0
 msgid "Name of the container"
 msgstr "Nom du conteneur"
 
 #. module: container
-#: view:container.container:0
+#: view:stock.container:0
 msgid "Weight / Volume"
 msgstr "Poids volumétrique"
 
 #. module: container
-#: help:container.container,address_id:0
+#: help:stock.container,address_id:0
 msgid "Address whom the container is located, used to retrieve it"
 msgstr "Adresse où le conteneur est situé, utilisée pour le retrouver"
 
 #. module: container
-#: help:container.container,incoming_move_list_ids:0
+#: help:stock.container,incoming_move_list_ids:0
 msgid "Incoming move List"
 msgstr "Liste de mouvements entrants"
 
 #. module: container
-#: help:container.container,rdv_date:0
+#: help:stock.container,rdv_date:0
 msgid "Date and time at which the transporter will show up at final destination to deliver the container"
 msgstr "Date et heure à laquelle le transporteur va annoncer la destination finale pour livrer le conteneur"
 
 #. module: container
-#: help:container.container,sscc:0
+#: help:stock.container,sscc:0
 msgid "Serial Shipping Container Code : unique worldwide identifier for shipping units (given by the shipping company at booking). This field should be formatted to 18 numeric character."
 msgstr "Serial Shipping Container Code : code mondial unique d'identification des unités de transport (donné par la société de transport à l'enregistrement). Ce champ doit avoir un format de 18 chiffres."
 
 #. module: container
-#: field:container.container,etm_date:0
+#: field:stock.container,etm_date:0
 msgid "Estimated time to market"
 msgstr "Disponibilité estimée sur le marché"
 
@@ -194,43 +194,43 @@ msgstr ""
 "Quantité insuffisante dans le conteneur sélectionné"
 
 #. module: container
-#: help:container.container,remaining_volume:0
+#: help:stock.container,remaining_volume:0
 msgid "The substraction of the container product gross volume minus the total GROSS volume of all products listed in incoming move lists of the container"
 msgstr "La soustraction du volume GROSS du conteneur moins le volume GROSS total de tous les produits listés dans la liste de bons entrants du conteneur"
 
 #. module: container
-#: code:addons/container/container.py:184
+#: code:addons/stock.container.py:184
 #, python-format
 msgid "Remaining volume must be positive !"
 msgstr "Le volume libre doit être positif !"
 
 #. module: container
-#: view:container.container:0
+#: view:stock.container:0
 msgid "Dates"
 msgstr "Dates"
 
 #. module: container
-#: field:container.container,rdv_date:0
+#: field:stock.container,rdv_date:0
 msgid "RDV"
 msgstr "RDV"
 
 #. module: container
-#: field:container.container,name:0
+#: field:stock.container,name:0
 msgid "Name"
 msgstr "Nom"
 
 #. module: container
-#: help:container.container,volume:0
+#: help:stock.container,volume:0
 msgid "The total GROSS volume of all products listed in incoming move lists of the container"
 msgstr "Le volume GROSS total de tous les produits listés dans la liste de bons entrants du conteneur"
 
 #. module: container
-#: field:container.container,outgoing_move_list_ids:0
+#: field:stock.container,outgoing_move_list_ids:0
 msgid "Outgoing Move List"
 msgstr "Liste de mouvements sortants"
 
 #. module: container
-#: view:container.container:0
+#: view:stock.container:0
 msgid "Outgoing Moves"
 msgstr "Mouvements sortants"
 
@@ -240,12 +240,12 @@ msgid "Companies"
 msgstr "Sociétés"
 
 #. module: container
-#: help:container.container,weight:0
+#: help:stock.container,weight:0
 msgid "The total weight of all products listed in incoming move lists of the container"
 msgstr "Poids total de tous les produits listés dans les mouvements entrants du conteneur"
 
 #. module: container
-#: code:addons/container/container.py:178
+#: code:addons/stock.container.py:178
 #, python-format
 msgid "You must define container stock location as company location !"
 msgstr "Vous devez définir un emplacement de conteneur comme emplacement de société !"
@@ -256,46 +256,46 @@ msgid "You must assign a production lot for this product"
 msgstr "Vous devez attribuer un lot de production pour ce produit"
 
 #. module: container
-#: field:container.container,container_stock_location_id:0
+#: field:stock.container,container_stock_location_id:0
 msgid "Container Stock Location"
 msgstr "Emplacement de stock du conteneur"
 
 #. module: container
-#: code:addons/container/container.py:209
+#: code:addons/stock.container.py:209
 #, python-format
 msgid "Some incoming move is in a done or cancel state picking !"
 msgstr "Certains mouvements de la liste entrante sont à l'état terminé ou annulé !"
 
 #. module: container
-#: code:addons/container/container.py:180
+#: code:addons/stock.container.py:180
 #, python-format
 msgid "You must define container stock location as supplier location !"
 msgstr "Vous devez définir un emplacement fournisseur comme emplacement de conteneur"
 
 #. module: container
-#: field:container.container,eta_date:0
-#: help:container.container,eta_date:0
+#: field:stock.container,eta_date:0
+#: help:stock.container,eta_date:0
 msgid "Estimated date of arrival"
 msgstr "Date d'arrivée estimée"
 
 #. module: container
-#: help:container.container,prod_serial:0
+#: help:stock.container,prod_serial:0
 msgid "Serial number of the product"
 msgstr "Numéro de série du produit"
 
 #. module: container
-#: help:container.container,product_id:0
+#: help:stock.container,product_id:0
 msgid "The container product"
 msgstr "Le produit conteneur"
 
 #. module: container
-#: field:container.container,prod_serial:0
+#: field:stock.container,prod_serial:0
 msgid "Product serial no."
 msgstr "Numéro de série du produit"
 
 #. module: container
-#: view:container.container:0
-#: selection:container.container,state:0
+#: view:stock.container:0
+#: selection:stock.container,state:0
 msgid "Clearance"
 msgstr "Dédouanement"
 
@@ -306,24 +306,24 @@ msgid "Not enough quantity"
 msgstr "Quantité insuffisante"
 
 #. module: container
-#: field:container.container,etd_date:0
-#: help:container.container,etd_date:0
+#: field:stock.container,etd_date:0
+#: help:stock.container,etd_date:0
 msgid "Date of departure"
 msgstr "Date de départ"
 
 #. module: container
-#: view:container.container:0
-#: selection:container.container,state:0
+#: view:stock.container:0
+#: selection:stock.container,state:0
 msgid "Approaching"
 msgstr "Approche"
 
 #. module: container
-#: field:container.container,volume:0
+#: field:stock.container,volume:0
 msgid "Volume"
 msgstr "Volume"
 
 #. module: container
-#: help:container.container,state:0
+#: help:stock.container,state:0
 msgid "Status of the container:\n"
 "  - Booking: The shipping company is preparing to ship\n"
 "  - Freight: The container is on the sea\n"
@@ -340,18 +340,18 @@ msgstr "Étape du conteneur :\n"
 "  - Livré : le conteneur est livré"
 
 #. module: container
-#: view:container.container:0
-#: selection:container.container,state:0
+#: view:stock.container:0
+#: selection:stock.container,state:0
 msgid "Unpacking"
 msgstr "Déchargement"
 
 #. module: container
-#: field:container.container,destination_warehouse_id:0
+#: field:stock.container,destination_warehouse_id:0
 msgid "Destination Warehouse"
 msgstr "Entrepôt de destination"
 
 #. module: container
-#: field:container.container,weight:0
+#: field:stock.container,weight:0
 msgid "Weight"
 msgstr "Poids"
 
@@ -361,23 +361,23 @@ msgid "Stock Move"
 msgstr "Mouvement de stock"
 
 #. module: container
-#: code:addons/container/container.py:266
+#: code:addons/stock.container.py:266
 #, python-format
 msgid "Incoming or outgoing packing list not in cancel state !"
 msgstr "Des bons entrants ou sortants ne sont pas en état annulé !"
 
 #. module: container
-#: help:container.container,destination_warehouse_id:0
+#: help:stock.container,destination_warehouse_id:0
 msgid "Warehouse destination of the container's contents"
 msgstr "Entrepôt de destination du conteneur"
 
 #. module: container
-#: view:container.container:0
+#: view:stock.container:0
 msgid "General"
 msgstr "Général"
 
 #. module: container
-#: field:container.container,sscc:0
+#: field:stock.container,sscc:0
 msgid "SSCC"
 msgstr "SSCC"
 
@@ -387,24 +387,24 @@ msgid "Check to allow container to update dates on pickings and moves"
 msgstr "Cochez cette case pour permettre au conteneur de mettre à jour les dates sur les mouvements de stock et les bons"
 
 #. module: container
-#: field:container.container,incoming_move_list_ids:0
+#: field:stock.container,incoming_move_list_ids:0
 msgid "Incoming Move List"
 msgstr "Liste de mouvements entrants"
 
 #. module: container
-#: help:container.container,partner_id:0
+#: help:stock.container,partner_id:0
 msgid "Partner whom shipping container"
 msgstr "Partenaire d'où part le conteneur"
 
 #. module: container
-#: view:container.container:0
-#: selection:container.container,state:0
+#: view:stock.container:0
+#: selection:stock.container,state:0
 msgid "Freight"
 msgstr "Transport"
 
 #. module: container
-#: view:container.container:0
-#: selection:container.container,state:0
+#: view:stock.container:0
+#: selection:stock.container,state:0
 msgid "Cancel"
 msgstr "Annulé"
 
@@ -414,12 +414,12 @@ msgid "Sales Order"
 msgstr "Commande de ventes"
 
 #. module: container
-#: field:container.container,address_id:0
+#: field:stock.container,address_id:0
 msgid "Address to retrieve the container"
 msgstr "Adresse où trouver le conteneur"
 
 #. module: container
-#: help:container.container,etm_date:0
+#: help:stock.container,etm_date:0
 msgid "Estimated date products available for delivery to customer"
 msgstr "Date de disponibilité estimée des produits pour livraison au client"
 

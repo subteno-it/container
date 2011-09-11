@@ -6,6 +6,7 @@
         #    container module for OpenERP, Manages containers receipt
         #    Copyright (C) 2011 SYLEAM Info Services ([http://www.Syleam.fr/]) 
         #              Sylvain Garancher [sylvain.garancher@syleam.fr]
+        #              Sebastien LANGE [sebastien.lange@syleam.fr]
         #
         #    This file is a part of container
         #
@@ -69,9 +70,9 @@
                         <page string="General">
                             <group colspan="2" col="2">
                                 <separator colspan="2" string="Dates"/>
-                                <field name="etd_date" select="1"/>
-                                <field name="eta_date" select="1"/>
-                                <field name="etm_date" select="1"/>
+                                <field name="etd_date" select="1" on_change="onchange_etd_date(etd_date)"/>
+                                <field name="eta_date" select="1" on_change="onchange_eta_date(eta_date)"/>
+                                <field name="etm_date" select="1" on_change="onchange_etm_date(etm_date)"/>
                                 <field name="rdv_date" select="1"/>
                             </group>
                             <group colspan="2" col="2">
@@ -95,11 +96,11 @@
                                     <field name="origin" readonly="1"/>
                                     <field name="partner_id" readonly="1"/>
                                     <field name="product_id" readonly="1"/>
-                                    <field name="product_qty" on_change="onchange_quantity(product_id, product_qty, product_uom, product_uos)" readonly="1"/>
+                                    <field name="product_qty" readonly="1"/>
                                     <field name="product_uom" string="UoM" readonly="1"/>
                                     <field name="product_uos" groups="product.group_uos" readonly="1"/>
                                     <field name="prodlot_id" groups="base.group_extended" readonly="1"/>
-                                    <field groups="base.group_extended" name="tracking_id" readonly="1"/>
+                                    <field name="tracking_id" groups="base.group_extended" readonly="1"/>
                                     <field name="location_id" readonly="1"/>
                                     <field name="location_dest_id" readonly="1"/>
                                     <field name="date" readonly="1"/>
@@ -109,8 +110,7 @@
                             </field>
                         </page>
                         <page string="Stock Moves">
-                            <field name="move_line_ids" nolabel="1" colspan="4"/>
-                            <button name="%(stock.action_partial_move_server)d" string="Partial" type="action" states="booking" icon="gtk-justify-fill"/>
+                            <field name="move_line_ids" nolabel="1" colspan="4" readonly="1"/>
                         </page>
                     </notebook>
                     <field name="state"/>

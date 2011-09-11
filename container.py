@@ -178,7 +178,7 @@ class stock_container(osv.osv):
 
             if company.container_updates_dates:
                 # Adjusts dates on moves
-                if values.get('state', container.state) != 'draft':
+                if values.get('state', container.state) not in ('draft', 'booking'):
                     stock_move_obj = self.pool.get('stock.move')
                     stock_picking_obj = self.pool.get('stock.picking')
 
@@ -234,7 +234,7 @@ class stock_container(osv.osv):
             #    raise osv.except_osv(_('Warning !'), _('You must define container stock location as company location !'))
             #elif container.incoterm_id.code in ['DAF', 'DES', 'DES', 'DDU', 'DDP'] and container.container_stock_location_id.usage != 'supplier':
             #    raise osv.except_osv(_('Warning !'), _('You must define container stock location as supplier location !'))
-            # In version 6, we must have the stock location in internal else impossible to create invoice supplier
+            #FIXME : In version 6, we must have the stock location in internal else impossible to create invoice supplier
             if container.container_stock_location_id.usage != 'supplier':
                 raise osv.except_osv(_('Warning !'), _('You must define container stock location as supplier location !'))
 
@@ -355,6 +355,64 @@ class stock_container(osv.osv):
         }
 
         return super(stock_container, self).copy(cr, uid, id, default, context=context)
+
+    def onchange_etd_date(self, cr, uid, ids, new_date, context=None):
+        """
+        Change date of container
+        """
+        date_etd = datetime.strptime(new_date, '%Y-%m-%d')
+        for container in self.browse(cr, uid, ids, context=context):
+            etm_date = date_etd + timedelta(container.product_id.sale_delay or 0)
+            eta_date = etm_date - timedelta(container.product_id.produce_delay or 0)
+        return {'value': {
+            'eta_date': eta_date.strftime('%Y-%m-%d'),
+            'etm_date': etm_date.strftime('%Y-%m-%d'),
+            'rdv_date': etm_date.strftime('%Y-%m-%d'),
+        }}
+
+    def onchange_eta_date(self, cr, uid, ids, new_date, context=None):
+        """
+        Change date of container
+        """
+        date_eta = datetime.strptime(new_date, '%Y-%m-%d')
+        for container in self.browse(cr, uid, ids, context=context):
+            etm_date = date_eta + timedelta(container.product_id.produce_delay or 0)
+            if container.state in ('draft', 'booking'):
+                etd_date = etm_date - timedelta(container.product_id.sale_delay or 0)
+                return {'value': {
+                    'etd_date': etd_date.strftime('%Y-%m-%d'),
+                    'etm_date': etm_date.strftime('%Y-%m-%d'),
+                    'rdv_date': etm_date.strftime('%Y-%m-%d'),
+                }}
+            return {'value': {
+                'etm_date': etm_date.strftime('%Y-%m-%d'),
+                'rdv_date': etm_date.strftime('%Y-%m-%d'),
+            }}
+
+    def onchange_etm_date(self, cr, uid, ids, new_date, context=None):
+        """
+        Change date of container
+        """
+        date_etm = datetime.strptime(new_date, '%Y-%m-%d')
+        for container in self.browse(cr, uid, ids, context=context):
+            if container.state in ('draft', 'booking'):
+                eta_date = date_etm - timedelta(container.product_id.produce_delay or 0)
+                etd_date = date_etm - timedelta(container.product_id.sale_delay or 0)
+                return {'value': {
+                    'eta_date': eta_date.strftime('%Y-%m-%d'),
+                    'etd_date': etd_date.strftime('%Y-%m-%d'),
+                    'rdv_date': date_etm.strftime('%Y-%m-%d'),
+                }}
+            elif container.state == 'freight':
+                etd_date = date_etm - timedelta(container.product_id.sale_delay or 0)
+                return {'value': {
+                    'etd_date': etd_date.strftime('%Y-%m-%d'),
+                    'rdv_date': date_etm.strftime('%Y-%m-%d'),
+                }}
+            else:
+                return {'value': {
+                    'rdv_date': date_etm.strftime('%Y-%m-%d'),
+                }}
 
 stock_container()
 

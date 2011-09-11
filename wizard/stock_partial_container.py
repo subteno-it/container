@@ -148,7 +148,8 @@ class stock_partial_container(osv.osv_memory):
                             'date' : partial.date,
                             'state': 'done',
                         })
-                container_obj.write(cr, uid, [container.id], {'etd_date': partial.date}, context=context)
+                new_dates = container_obj.get_dates_from_moves(cr, uid, container.id, context=context)
+                container_obj.write(cr, uid, [container.id], new_dates, context=context)
                 wf_service.trg_validate(uid, 'stock.container', container.id, 'button_freight', cr)
 
         return {'type': 'ir.actions.act_window_close'}
