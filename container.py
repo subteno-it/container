@@ -200,10 +200,13 @@ class container_container(osv.osv):
 
         for container in self.browse(cr, uid, ids, context=context):
             # Check container's location
-            if container.incoterm_id.code in ['EXW', 'FCA', 'FAS', 'FOB', 'CFR', 'CIF', 'CPT', 'CIP'] and container.container_stock_location_id.usage != 'internal':
-                raise osv.except_osv(_('Warning !'), _('You must define container stock location as company location !'))
-            elif container.incoterm_id.code in ['DAF', 'DES', 'DES', 'DDU', 'DDP'] and container.container_stock_location_id.usage != 'supplier':
-                raise osv.except_osv(_('Warning !'), _('You must define container stock location as supplier location !'))
+            #if container.incoterm_id.code in ['EXW', 'FCA', 'FAS', 'FOB', 'CFR', 'CIF', 'CPT', 'CIP'] and container.container_stock_location_id.usage != 'internal':
+            #    raise osv.except_osv(_('Warning !'), _('You must define container stock location as company location !'))
+            #elif container.incoterm_id.code in ['DAF', 'DES', 'DES', 'DDU', 'DDP'] and container.container_stock_location_id.usage != 'supplier':
+            #    raise osv.except_osv(_('Warning !'), _('You must define container stock location as supplier location !'))
+            # In version 6, we must have the stock location in internal else impossible to create invoice supplier
+            if container.container_stock_location_id.usage != 'internal':
+                raise osv.except_osv(_('Warning !'), _('You must define container stock location as internal location !'))
 
             # Check remaining volume
             if container.remaining_volume < 0:
