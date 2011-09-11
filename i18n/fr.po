@@ -337,7 +337,7 @@ msgstr "Étape du conteneur :\n"
 "  - Dédouanement : Le conteneur est en dédouanement\n"
 "  - Approche : Le conteneur est livré à sa destination finale et une réunion est organisée avec le logisticien à propos du lieu de destination\n"
 "  - Déchargement : Le conteneur est déchargé à sa destination finale\n"
-"  - Livré - le conteneur est livré"
+"  - Livré : le conteneur est livré"
 
 #. module: container
 #: view:container.container:0
