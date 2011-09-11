@@ -93,7 +93,7 @@ class stock_container(osv.osv):
                                                     states={'cancel': [('readonly', True)], 'delivered': [('readonly', True)]},
                                                     help='Warehouse destination of the container\'s contents'),
         'incoming_move_list_ids': fields.many2many('stock.move', 'stock_container_move_rel', 'container_id', 'move_id', 'Incoming Shipments',
-                                                   domain=[('picking_id.type', '=', 'in')],
+                                                   domain="[ ('picking_id.type', '=', 'in'), ('state', '=', 'assigned'), '|', ('location_id.categ_id.id', '=', container_stock_location_id), ('location_id.categ_id', '=', False)]",
                                                    readonly=True,
                                                    states={'draft': [('readonly', False)]},
                                                   ),
