@@ -31,7 +31,7 @@ class stock_move(osv.osv):
     _inherit = 'stock.move'
 
     _columns = {
-        'container_id': fields.many2one('container.container', 'Container', help='Container of this move'),
+        'container_id': fields.many2one('stock.container', 'Container', help='Container of this move'),
     }
 
 stock_move()

@@ -29,7 +29,7 @@
         #
         <record id="wkf_container" model="workflow">
             <field name="name">Container</field>
-            <field name="osv">container.container</field>
+            <field name="osv">stock.container</field>
             <field name="on_create">True</field>
         </record>
 

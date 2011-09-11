@@ -1,3 +1,3 @@
 "id","name","model_id/id","group_id/id","perm_read","perm_write","perm_create","perm_unlink"
-"container_container_user","container_container_user","container.model_container_container","","1","","",""
-"container_container_manager","container_container_manager","container.model_container_container","base.group_sale_manager","1","1","1","1"
+"stock_container_user","stock_container_user","container.model_stock_container","","1","","",""
+"stock_container_manager","stock_container_manager","container.model_stock_container","base.group_sale_manager","1","1","1","1"

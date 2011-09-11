@@ -30,8 +30,8 @@ from tools.translate import _
 import netsvc
 
 
-class container_container(osv.osv):
-    _name = 'container.container'
+class stock_container(osv.osv):
+    _name = 'stock.container'
     _description = 'Container'
 
     def _compute_values(self, cr, uid, ids, field_name, arg, context=None):
@@ -92,11 +92,8 @@ class container_container(osv.osv):
         'destination_warehouse_id': fields.many2one('stock.warehouse', 'Destination Warehouse', required=True,
                                                     states={'cancel': [('readonly', True)], 'delivered': [('readonly', True)]},
                                                     help='Warehouse destination of the container\'s contents'),
-        #'incoming_move_list_ids': fields.one2many('stock.move', 'container_id', 'Incoming Move List', domain=[('picking_id.type', '=', 'in'), ('picking_id.state', 'not in', ('done', 'cancel'))], readonly=True,
-        #                                             states={'draft': [('readonly', False)]},
-        #                                             help='Incoming move List'),
-        'incoming_move_list_ids': fields.many2many('stock.move', 'container_move_rel', 'container_id', 'move_id', 'Incoming Shipments',
-                                                   domain=[('picking_id.type', '=', 'in'),('container_id', '=', False),('picking_id.state', 'not in', ('done', 'cancel'))],
+        'incoming_move_list_ids': fields.many2many('stock.move', 'stock_container_move_rel', 'container_id', 'move_id', 'Incoming Shipments',
+                                                   domain=[('picking_id.type', '=', 'in'),('picking_id.state', 'not in', ('done', 'cancel'))],
                                                    readonly=True,
                                                    states={'draft': [('readonly', False)]},
                                                   ),
@@ -177,7 +174,7 @@ class container_container(osv.osv):
             if rdv_date:
                 values['rdv_date'] = rdv_date,
 
-            res = super(container_container, self).write(cr, uid, ids, values, context=context)
+            res = super(stock_container, self).write(cr, uid, ids, values, context=context)
 
             if company.container_updates_dates:
                 # Adjusts dates on moves
@@ -204,7 +201,7 @@ class container_container(osv.osv):
         if [container.id for container in self.browse(cr, uid, ids, context=context) if container.state == 'draft']:
             raise osv.except_osv(_('Error'), _('A container must be in state draft to be deleted !'))
 
-        res = super(container_container, self).unlink(cr, uid, ids, context=context)
+        res = super(stock_container, self).unlink(cr, uid, ids, context=context)
         return res
 
     def action_draft(self, cr, uid, ids, context=None):
@@ -214,6 +211,7 @@ class container_container(osv.osv):
 
         for container in self.browse(cr, uid, ids, context=context):
             # Chek if the user filled picking in in this container before booking
+            print container.line_ids
             if container.line_ids:
                 # Read incoming move list
                 move_ids = [move.id for move in container.line_ids]
@@ -277,17 +275,32 @@ class container_container(osv.osv):
             # There is no context in workflow, so get it on user
             context = self.pool.get('res.users').context_get(cr, uid, context=context)
 
-        stock_move_obj = self.pool.get('stock.move')
+        #stock_move_obj = self.pool.get('stock.move')
 
-        move_ids = []
+        #move_ids = []
 
-        for container in self.browse(cr, uid, ids, context=context):
-            # Add move ids in the list
-            move_ids.extend([move.id for move in container.line_ids])
+        #for container in self.browse(cr, uid, ids, context=context):
+        #    # Add move ids in the list
+        #    move_ids.extend([move.id for move in container.line_ids])
 
-        stock_move_obj.action_done(cr, uid, move_ids, context=context)
+        #stock_move_obj.action_done(cr, uid, move_ids, context=context)
 
-        return True
+        #return True
+        partial_id = self.pool.get("container.partial.picking").create(
+            cr, uid, {}, context=dict(context, active_ids=ids))
+        return {
+            'name':_("Products to Process"),
+            'view_mode': 'form',
+            'view_id': False,
+            'view_type': 'form',
+            'res_model': 'container.partial.picking',
+            'res_id': partial_id,
+            'type': 'ir.actions.act_window',
+            'nodestroy': True,
+            'target': 'new',
+            'domain': '[]',
+            'context': dict(context, active_ids=ids)
+        }
 
     def action_clearance(self, cr, uid, ids, context=None):
         """
@@ -398,8 +411,8 @@ class container_container(osv.osv):
             'line_ids': [],
         }
 
-        return super(container_container, self).copy(cr, uid, id, default, context=context)
+        return super(stock_container, self).copy(cr, uid, id, default, context=context)
 
-container_container()
+stock_container()
 
 # vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:

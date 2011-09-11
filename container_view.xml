@@ -27,9 +27,9 @@
         #
         # Container view
         #
-        <record id="view_container_container_tree" model="ir.ui.view">
-            <field name="name">container.container.tree</field>
-            <field name="model">container.container</field>
+        <record id="view_stock_container_tree" model="ir.ui.view">
+            <field name="name">stock.container.tree</field>
+            <field name="model">stock.container</field>
             <field name="type">tree</field>
             <field name="priority" eval="8"/>
             <field name="arch" type="xml">
@@ -51,9 +51,9 @@
                 </tree>
             </field>
         </record>
-        <record id="view_container_container_form" model="ir.ui.view">
-            <field name="name">container.container.form</field>
-            <field name="model">container.container</field>
+        <record id="view_stock_container_form" model="ir.ui.view">
+            <field name="name">stock.container.form</field>
+            <field name="model">stock.container</field>
             <field name="type">form</field>
             <field name="priority" eval="8"/>
             <field name="arch" type="xml">
@@ -127,28 +127,28 @@
                 </form>
             </field>
         </record>
-        <record model="ir.actions.act_window" id="act_open_container_container_view">
+        <record model="ir.actions.act_window" id="act_open_stock_container_view">
             <field name="name">Container</field>
             <field name="type">ir.actions.act_window</field>
-            <field name="res_model">container.container</field>
+            <field name="res_model">stock.container</field>
             <field name="view_type">form</field>
             <field name="view_mode">tree,form</field>
             <field name="domain">[]</field>
             <field name="context">{}</field>
         </record>
-        <record model="ir.actions.act_window.view" id="act_open_container_container_view_form">
-            <field name="act_window_id" ref="act_open_container_container_view"/>
+        <record model="ir.actions.act_window.view" id="act_open_stock_container_view_form">
+            <field name="act_window_id" ref="act_open_stock_container_view"/>
             <field name="sequence" eval="20"/>
             <field name="view_mode">form</field>
-            <field name="view_id" ref="view_container_container_form"/>
+            <field name="view_id" ref="view_stock_container_form"/>
         </record>
-        <record model="ir.actions.act_window.view" id="act_open_container_container_view_tree">
-            <field name="act_window_id" ref="act_open_container_container_view"/>
+        <record model="ir.actions.act_window.view" id="act_open_stock_container_view_tree">
+            <field name="act_window_id" ref="act_open_stock_container_view"/>
             <field name="sequence" eval="10"/>
             <field name="view_mode">tree</field>
-            <field name="view_id" ref="view_container_container_tree"/>
+            <field name="view_id" ref="view_stock_container_tree"/>
         </record>
-        <menuitem id="menu_container_container" parent="stock.menu_stock_root" sequence="20" action="act_open_container_container_view"/>
+        <menuitem id="menu_stock_container" parent="stock.menu_stock_root" sequence="20" action="act_open_stock_container_view"/>
 
     </data>
 </openerp>
