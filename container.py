@@ -96,7 +96,22 @@ class container_container(osv.osv):
                                                      states={'draft': [('readonly', False)]},
                                                      help='Incoming move List'),
         'outgoing_move_list_ids': fields.one2many('stock.move', 'container_id', 'Outgoing Move List', domain=[('picking_id', '=', False)], readonly=True, help='Outgoing move List'),
-        'state': fields.selection([('draft', 'Draft'), ('booking', 'Booking'), ('freight', 'Freight'), ('clearance', 'Clearance'), ('approaching', 'Approaching'), ('unpacking', 'Unpacking'), ('delivered', 'Delivered'), ('cancel', 'Cancel')], 'Status', readonly=True, help='State of the container'),
+        'state': fields.selection([('draft', 'Draft'),
+                                   ('booking', 'Booking'),
+                                   ('freight', 'Freight'),
+                                   ('clearance', 'Clearance'),
+                                   ('approaching', 'Approaching'),
+                                   ('unpacking', 'Unpacking'),
+                                   ('delivered', 'Delivered'),
+                                   ('cancel', 'Cancel')],
+                                  'Status', readonly=True,
+                                  help="""Status of the container:
+  - Booking : The shipping company is preparing to ship
+  - Freight : The container is on the sea
+  - Clearance : The container is undergoing custom clearance
+  - Approaching : The container is being transported locally to its final destination and a meeting is organized with the logistic guy at destination location
+  - Unpacking : The container is being unpacked at its final destination
+  - Delivered : the container is archived with all fields locked"""),
         'prod_serial': fields.related('product_id', 'code', type='char', string='Product serial no.', help='Serial number of the product'),
     }
 

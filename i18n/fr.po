@@ -315,17 +315,29 @@ msgstr "Date de départ"
 #: view:container.container:0
 #: selection:container.container,state:0
 msgid "Approaching"
-msgstr "En approche"
-
-#. module: container
-#: help:container.container,state:0
-msgid "State of the container"
-msgstr "État du conteneur"
+msgstr "Approche"
 
 #. module: container
 #: field:container.container,volume:0
 msgid "Volume"
 msgstr "Volume"
+
+#. module: container
+#: help:container.container,state:0
+msgid "Status of the container:\n"
+"  - Booking: The shipping company is preparing to ship\n"
+"  - Freight: The container is on the sea\n"
+"  - Clearance: The container is undergoing custom clearance\n"
+"  - Approaching: The container is being transported locally to its final destination and a meeting is organized with the logistic guy at destination location\n"
+"  - Unpacking: The container is being unpacked at its final destination\n"
+"  - Delivered: the container is archived with all fields locked"
+msgstr "Étape du conteneur :\n"
+"  - Réservation : La compagnie maritime se prépare à expédier\n"
+"  - Fret : Le conteneur est sur la mer\n"
+"  - Dédouanement : Le conteneur est en dédouanement\n"
+"  - Approche : Le conteneur est livré à sa destination finale et une réunion est organisée avec le logisticien à propos du lieu de destination\n"
+"  - Déchargement : Le conteneur est déchargé à sa destination finale\n"
+"  - Livré - le conteneur est livré"
 
 #. module: container
 #: view:container.container:0
