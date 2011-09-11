@@ -81,8 +81,7 @@ write({'state': 'unpacking'})</field>
             <field name="wkf_id" ref="wkf_container"/>
             <field name="name">delivered</field>
             <field name="kind">function</field>
-            <field name="action">action_delivered()
-write({'state': 'delivered'})</field>
+            <field name="action">write({'state': 'delivered'})</field>
             <field name="flow_stop">True</field>
         </record>
         <record id="wkf_act_cancel" model="workflow.activity">

@@ -122,7 +122,7 @@
                         <button name="button_clearance" string="Clearance" states="freight" icon="gtk-media-pause"/>
                         <button name="button_approach" string="Approaching" states="clearance" icon="gtk-ok"/>
                         <button name="button_unpack" string="Unpacking" states="approaching" icon="gtk-jump-to"/>
-                        <button name="button_deliver" string="Delivered" states="unpacking" icon="gtk-convert"/>
+                        <button name="action_deliver" string="Delivered" states="unpacking" type="object" icon="gtk-convert"/>
                     </group>
                 </form>
             </field>

@@ -93,7 +93,7 @@ class stock_container(osv.osv):
                                                     states={'cancel': [('readonly', True)], 'delivered': [('readonly', True)]},
                                                     help='Warehouse destination of the container\'s contents'),
         'incoming_move_list_ids': fields.many2many('stock.move', 'stock_container_move_rel', 'container_id', 'move_id', 'Incoming Shipments',
-                                                   domain=[('picking_id.type', '=', 'in'),('picking_id.state', 'not in', ('done', 'cancel'))],
+                                                   domain=[('picking_id.type', '=', 'in')],
                                                    readonly=True,
                                                    states={'draft': [('readonly', False)]},
                                                   ),
@@ -316,77 +316,33 @@ class stock_container(osv.osv):
 
         return True
 
-    def action_delivered(self, cr, uid, ids, context=None):
+    def action_deliver(self, cr, uid, ids, context=None):
         """
         Action lanched when arriving on delivered state
         """
         if context is None:
-            # There is no context in workflow, so get it on user
-            context = self.pool.get('res.users').context_get(cr, uid, context=context)
-
-        stock_move_obj = self.pool.get('stock.move')
-        product_product_obj = self.pool.get('product.product')
-        stock_picking_obj = self.pool.get('stock.picking')
+            context = {}
         wf_service = netsvc.LocalService("workflow")
 
         for container in self.browse(cr, uid, ids, context=context):
-            # Retrieve total in quantity per product
-            in_move_ids = stock_move_obj.search(cr, uid, [('container_id', '=', container.id), ('picking_id.type', '=', 'in')], context=context)
-            in_move_data = stock_move_obj.read(cr, uid, in_move_ids, ['product_id', 'product_qty'], context=context)
-            in_product_qty = {}
-            for in_move in in_move_data:
-                in_product_qty[in_move['product_id'][0]] = in_product_qty.get(in_move['product_id'][0], 0) +  in_move['product_qty']
+            picking_ids = [move.picking_id.id for move in container.incoming_move_list_ids]
+            wf_service.trg_validate(uid, 'stock.container', container.id, 'button_deliver', cr)
 
-            # Retrieve total out quantity per product
-            out_move_ids = stock_move_obj.search(cr, uid, [('container_id', '=', container.id), ('picking_id.type', '=', 'out')], context=context)
-            out_move_data = stock_move_obj.read(cr, uid, out_move_ids, ['product_id', 'product_qty'], context=context)
-            out_product_qty = {}
-            for out_move in out_move_data:
-                out_product_qty[out_move['product_id'][0]] = out_product_qty.get(out_move['product_id'][0], 0) + out_move['product_qty']
-
-            # Check incoming vs outgoing quantities
-            diff = self.check_outgoing_incoming(cr, uid, out_product_qty, in_product_qty, context=context)
-            if diff:
-                raise osv.except_osv(_('Warning !'), _('Outgoing packing list product or qty is higher then Incoming packing !'))
-
-            # Create new outgoing move if there is unused quantity on some products, to store them in the container's warehouse
-            # TODO : Useless part now ?
-            diff = self.check_outgoing_incoming(cr, uid, in_product_qty, out_product_qty, context=context)
-            if diff:
-                # Create moves
-                for product_id, product_qty in diff.items():
-                    product = product_product_obj.browse(cr, uid, product_id, context=context)
-                    values = {
-                        'name': product.name,
-                        'product_id': product_id,
-                        'product_uom': product.uom_id and product.uom_id.id or False,
-                        'location_id': container.container_stock_location_id.id,
-                        'location_dest_id': container.destination_warehouse_id and container.destination_warehouse_id.lot_input_id.id,
-                        'date': container.etm_date or datetime.today().strftime('%Y-%m-%d'),
-                        'product_qty': product_qty,
-                        'container_id': container.id,
-                    }
-                    stock_move_obj.create(cr, uid, values, context=context)
-
-            # Set all outgoing pickings' state to done
-            move_ids = [move.id for move in container.move_line_ids]
-            stock_move_obj.action_done(cr, uid, move_ids, context=context)
-
-        return True
-
-    def check_outgoing_incoming(self, cr, uid, product_list_1, product_list_2, context=None):
-        """
-        Checks the waited or received quantities
-        TODO : Check if the methods does the same thing after refactoring
-        """
-        picking_prod = {}
-
-        for product_id, product_qty in product_list_1.items():
-            diff = min(max(0, product_qty - product_list_2.get(product_id, 0)), product_qty)
-            if diff > 0:
-                picking_prod[product_id] = diff
-
-        return picking_prod
+        partial_id = self.pool.get("stock.partial.picking").create(
+            cr, uid, {}, context=dict(context, active_ids=picking_ids))
+        return {
+            'name':_("Products to Process"),
+            'view_mode': 'form',
+            'view_id': False,
+            'view_type': 'form',
+            'res_model': 'stock.partial.picking',
+            'res_id': partial_id,
+            'type': 'ir.actions.act_window',
+            'nodestroy': True,
+            'target': 'new',
+            'domain': '[]',
+            'context': dict(context, active_ids=picking_ids)
+        }
 
     def copy(self, cr, uid, id, default=None, context=None):
         """
