@@ -329,7 +329,7 @@ class stock_container(osv.osv):
             wf_service.trg_validate(uid, 'stock.container', container.id, 'button_deliver', cr)
 
         partial_id = self.pool.get("stock.partial.picking").create(
-            cr, uid, {}, context=dict(context, active_ids=picking_ids))
+            cr, uid, {}, context=dict(context, active_ids=picking_ids, container_ids=ids))
         return {
             'name':_("Products to Process"),
             'view_mode': 'form',
@@ -341,7 +341,7 @@ class stock_container(osv.osv):
             'nodestroy': True,
             'target': 'new',
             'domain': '[]',
-            'context': dict(context, active_ids=picking_ids)
+            'context': dict(context, active_ids=picking_ids, container_ids=ids)
         }
 
     def copy(self, cr, uid, id, default=None, context=None):

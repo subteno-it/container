@@ -36,4 +36,33 @@ class stock_move(osv.osv):
 
 stock_move()
 
+class stock_picking(osv.osv):
+    _inherit = 'stock.picking'
+
+    def do_partial(self, cr, uid, ids, partial_datas, context=None):
+        if context is None:
+            context = {}
+        res = super(stock_picking, self).do_partial(cr, uid, ids, partial_datas, context=context)
+        container_ids = context.get('container_ids', [])
+        # Check if in a container
+        if container_ids:
+            move_obj = self.pool.get('stock.move')
+            container_obj = self.pool.get('stock.container')
+            for container in container_obj.browse(cr, uid, container_ids, context=context):
+                for picking in self.browse(cr, uid, ids, context=context):
+                    # Check if backorder, if yes, we must remove this picking of container and change location_id in stock move
+                    if picking.backorder_id:
+                        #FIXME : if not find partner ??
+                        if picking.partner_id:
+                            loc_id = picking.partner_id.property_stock_supplier.id
+                            for move in picking.move_lines:
+                                move_obj.write(cr, uid, [move.id], {'location_id': loc_id}, context=context)
+                                container_obj.write(cr, uid, [container.id], {'incoming_move_list_ids': [(3, move.id)]}, context=context)
+                        for move_backorder in picking.backorder_id.move_lines:
+                            container_obj.write(cr, uid, [container.id], {'incoming_move_list_ids': [(4, move_backorder.id)]}, context=context)
+        return res
+
+stock_picking()
+
+
 # vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:
