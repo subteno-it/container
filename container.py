@@ -175,7 +175,7 @@ class stock_container(osv.osv):
             if rdv_date:
                 values['rdv_date'] = rdv_date,
 
-            res = super(stock_container, self).write(cr, uid, ids, values, context=context)
+            res = super(stock_container, self).write(cr, uid, [container.id], values, context=context)
 
             if company.container_updates_dates:
                 # Adjusts dates on moves
