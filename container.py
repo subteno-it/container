@@ -59,56 +59,67 @@ class stock_container(osv.osv):
 
     _columns = {
         'name': fields.char('Name', size=64, required=True, help='Name of the container'),
-        'partner_id': fields.many2one('res.partner', 'Freight Broker', readonly=True,
-                                      states={'draft': [('readonly', False)], 'booking': [('readonly', False), ('required', True)]},
-                                      help='Partner whom shipping container'),
-        'address_id': fields.many2one('res.partner.address', 'Address to retrieve the container', readonly=True,
-                                      states={'draft': [('readonly', False)], 'booking': [('readonly', False), ('required', True)]},
-                                      help='Address whom the container is located, used to retrieve it'),
-        'sscc': fields.char('SSCC', size=18, readonly=True,
-                            states={'draft': [('readonly', False)], 'booking': [('readonly', False), ('required', True)]},
-                            help='Serial Shipping Container Code : unique worldwide identifier for shipping units (given by the shipping company at booking). This field should be formatted to 18 numeric character.'),
-        'etd_date': fields.date('Date of departure', readonly=True,
-                                states={'draft': [('readonly', False)], 'booking': [('readonly', False), ('required', True)]},
-                                help='Date of departure'),
-        'eta_date': fields.date('Estimated date of arrival', readonly=True,
-                                states={'booking': [('readonly', False), ('required', True)], 'freight': [('readonly', False), ('required', True)]},
-                                help='Estimated date of arrival'),
-        'etm_date': fields.date('Estimated time to market',
-                                states={'draft': [('readonly', True)], 'unpacking': [('readonly', True)], 'cancel': [('readonly', True)], 'delivered': [('readonly', True)]},
-                                help='Estimated date products available for delivery to customer'),
-        'rdv_date': fields.datetime('RDV', readonly=True,
-                                    states={'approaching': [('required', True), ('readonly', False)]},
-                                    help='Date and time at which the transporter will show up at final destination to deliver the container'),
+        'partner_id': fields.many2one(
+            'res.partner', 'Freight Broker', readonly=True,
+            states={'draft': [('readonly', False)], 'booking': [('readonly', False), ('required', True)]},
+            help='Partner whom shipping container'),
+        'address_id': fields.many2one(
+            'res.partner.address', 'Address to retrieve the container', readonly=True,
+            states={'draft': [('readonly', False)], 'booking': [('readonly', False), ('required', True)]},
+            help='Address whom the container is located, used to retrieve it'),
+        'sscc': fields.char(
+            'SSCC', size=18, readonly=True,
+            states={'draft': [('readonly', False)], 'booking': [('readonly', False), ('required', True)]},
+            help='Serial Shipping Container Code : unique worldwide identifier for shipping units (given by the shipping company at booking). This field should be formatted to 18 numeric character.'),
+        'etd_date': fields.date(
+            'Date of departure', readonly=True,
+            states={'draft': [('readonly', False)], 'booking': [('readonly', False), ('required', True)]},
+            help='Date of departure'),
+        'eta_date': fields.date(
+            'Estimated date of arrival', readonly=True,
+            states={'booking': [('readonly', False), ('required', True)], 'freight': [('readonly', False), ('required', True)]},
+            help='Estimated date of arrival'),
+        'etm_date': fields.date(
+            'Estimated time to market',
+            states={'draft': [('readonly', True)], 'unpacking': [('readonly', True)], 'cancel': [('readonly', True)], 'delivered': [('readonly', True)]},
+            help='Estimated date products available for delivery to customer'),
+        'rdv_date': fields.datetime(
+            'RDV', readonly=True,
+            states={'approaching': [('required', True), ('readonly', False)]},
+            help='Date and time at which the transporter will show up at final destination to deliver the container'),
         'weight': fields.function(_compute_values, method=True, string='Weight', type='float', store=False, multi='values', help='The total weight of all products listed in incoming move lists of the container'),
         'volume': fields.function(_compute_values, method=True, string='Volume', type='float', store=False, multi='values', help='The total GROSS volume of all products listed in incoming move lists of the container'),
         'remaining_volume': fields.function(_compute_values, method=True, string='Remaining Volume', type='float', store=False, multi='values', help='The substraction of the container product gross volume minus the total GROSS volume of all products listed in incoming move lists of the container'),
-        'product_id': fields.many2one('product.product', 'Product', required=True,
-                                      states={'draft': [('readonly', False)]},
-                                      help='The container product'),
+        'product_id': fields.many2one(
+            'product.product', 'Product', required=True,
+            states={'draft': [('readonly', False)]},
+            help='The container product'),
         'incoterm_id': fields.many2one('stock.incoterms', 'Incoterm', required=True, help='Incoterm'),
-        'container_stock_location_id': fields.many2one('stock.location', 'Container Stock Location', required=True, readonly=True,
-                                                       states={'draft': [('readonly', False)]},
-                                                       help='Stck location of the container\'s contents'),
-        'destination_warehouse_id': fields.many2one('stock.warehouse', 'Destination Warehouse', required=True,
-                                                    states={'cancel': [('readonly', True)], 'delivered': [('readonly', True)]},
-                                                    help='Warehouse destination of the container\'s contents'),
-        'incoming_move_list_ids': fields.many2many('stock.move', 'stock_container_move_rel', 'container_id', 'move_id', 'Incoming Shipments',
-                                                   domain="[ ('picking_id.type', '=', 'in'), ('state', '=', 'assigned'), '|', ('location_id.categ_id.id', '=', container_stock_location_id), ('location_id.categ_id', '=', False)]",
-                                                   readonly=True,
-                                                   states={'draft': [('readonly', False)]},
-                                                  ),
+        'container_stock_location_id': fields.many2one(
+            'stock.location', 'Container Stock Location', required=True, readonly=True,
+            states={'draft': [('readonly', False)]},
+            help='Stck location of the container\'s contents'),
+        'destination_warehouse_id': fields.many2one(
+            'stock.warehouse', 'Destination Warehouse', required=True,
+            states={'cancel': [('readonly', True)], 'delivered': [('readonly', True)]},
+            help='Warehouse destination of the container\'s contents'),
+        'incoming_move_list_ids': fields.many2many(
+            'stock.move', 'stock_container_move_rel', 'container_id', 'move_id', 'Incoming Shipments',
+            domain="[('picking_id.type', '=', 'in'), ('state', '=', 'assigned'), '|', ('location_id.categ_id.id', '=', container_stock_location_id), ('location_id.categ_id', '=', False)]",
+            readonly=True,
+            states={'draft': [('readonly', False)]},
+        ),
         'move_line_ids': fields.one2many('stock.move', 'container_id', 'Outgoing Move List', readonly=True, help='Stock Moves'),
-        'state': fields.selection([('draft', 'Draft'),
-                                   ('booking', 'Booking'),
-                                   ('freight', 'Freight'),
-                                   ('clearance', 'Clearance'),
-                                   ('approaching', 'Approaching'),
-                                   ('unpacking', 'Unpacking'),
-                                   ('delivered', 'Delivered'),
-                                   ('cancel', 'Cancel')],
-                                  'Status', readonly=True,
-                                  help="""Status of the container:
+        'state': fields.selection([
+            ('draft', 'Draft'),
+            ('booking', 'Booking'),
+            ('freight', 'Freight'),
+            ('clearance', 'Clearance'),
+            ('approaching', 'Approaching'),
+            ('unpacking', 'Unpacking'),
+            ('delivered', 'Delivered'),
+            ('cancel', 'Cancel'),
+        ], 'Status', readonly=True, help="""Status of the container:
   - Booking : The shipping company is preparing to ship
   - Freight : The container is on the sea
   - Clearance : The container is undergoing custom clearance
@@ -191,7 +202,7 @@ class stock_container(osv.osv):
                     picking_ids = [data['picking_id'][0] for data in stock_move_data if data.get('picking_id', False)]
                     for picking in stock_picking_obj.browse(cr, uid, picking_ids, context=context):
                         new_date = max([datetime.strptime(move.date, '%Y-%m-%d %H:%M:%S') for move in picking.move_lines])
-                        picking.write({'min_date': new_date.strftime('%Y-%m-%d')})
+                        picking.write({'min_date': new_date.strftime('%Y-%m-%d')}, context=context)
 
         return res
 
@@ -257,7 +268,7 @@ class stock_container(osv.osv):
             for move in container.incoming_move_list_ids:
                 default['move_dest_id'] = move.id
                 # Create the new move
-                new_move_id = stock_move_obj.copy(cr, uid, move.id, default, context=context)
+                stock_move_obj.copy(cr, uid, move.id, default, context=context)
 
             # Read incoming move list
             move_ids = [move.id for move in container.incoming_move_list_ids]
@@ -365,6 +376,7 @@ class stock_container(osv.osv):
         for container in self.browse(cr, uid, ids, context=context):
             etm_date = date_etd + timedelta(container.product_id.sale_delay or 0)
             eta_date = etm_date - timedelta(container.product_id.produce_delay or 0)
+
         return {'value': {
             'eta_date': eta_date.strftime('%Y-%m-%d'),
             'etm_date': etm_date.strftime('%Y-%m-%d'),

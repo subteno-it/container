@@ -57,7 +57,6 @@ class sale_order_line(osv.osv):
         """
         Check if there is enough products available in selected containers and reserve if there is enough
         """
-        container_container_obj = self.pool.get('stock.container')
         stock_move_obj = self.pool.get('stock.move')
 
         sale_order_line_data = self.read(cr, uid, ids, ['product_id', 'product_uom_qty', 'container_id', 'move_ids'], context=context)

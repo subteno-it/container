@@ -36,6 +36,7 @@ class stock_move(osv.osv):
 
 stock_move()
 
+
 class stock_picking(osv.osv):
     _inherit = 'stock.picking'
 
