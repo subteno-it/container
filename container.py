@@ -285,10 +285,11 @@ class stock_container(osv.osv):
         if context is None:
             context = {}
 
-        partial_id = self.pool.get("stock.partial.container").create(
-            cr, uid, {}, context=dict(context, active_ids=ids))
+        ctx = dict(context, active_ids=ids, active_model=self._name)
+        partial_id = self.pool.get('stock.partial.container').create(cr, uid, {}, context=ctx)
+
         return {
-            'name':_("Products to Process"),
+            'name': _("Products to Process"),
             'view_mode': 'form',
             'view_id': False,
             'view_type': 'form',
@@ -298,7 +299,7 @@ class stock_container(osv.osv):
             'nodestroy': True,
             'target': 'new',
             'domain': '[]',
-            'context': dict(context, active_ids=ids)
+            'context': ctx,
         }
 
     def action_clearance(self, cr, uid, ids, context=None):
@@ -340,10 +341,10 @@ class stock_container(osv.osv):
             picking_ids = [move.picking_id.id for move in container.incoming_move_list_ids]
             wf_service.trg_validate(uid, 'stock.container', container.id, 'button_deliver', cr)
 
-        partial_id = self.pool.get("stock.partial.picking").create(
-            cr, uid, {}, context=dict(context, active_ids=picking_ids, container_ids=ids))
+        partial_id = self.pool.get("stock.partial.picking").create(cr, uid, {}, context=dict(context, active_ids=picking_ids, active_model='stock.picking', container_ids=ids))
+
         return {
-            'name':_("Products to Process"),
+            'name': _("Products to Process"),
             'view_mode': 'form',
             'view_id': False,
             'view_type': 'form',

@@ -1,12 +1,52 @@
 <?xml version="1.0" encoding="utf-8"?>
 <openerp>
     <data>
+        ##############################################################################
+        #
+        #    container module for OpenERP, Manages containers receipt
+        #    Copyright (C) 2012 SYLEAM Info Services ([http://www.Syleam.fr/])
+        #              Sylvain Garancher [sylvain.garancher@syleam.fr]
+        #
+        #    This file is a part of container
+        #
+        #    container is free software: you can redistribute it and/or modify
+        #    it under the terms of the GNU General Public License as published by
+        #    the Free Software Foundation, either version 3 of the License, or
+        #    (at your option) any later version.
+        #
+        #    container is distributed in the hope that it will be useful,
+        #    but WITHOUT ANY WARRANTY; without even the implied warranty of
+        #    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+        #    GNU General Public License for more details.
+        #
+        #    You should have received a copy of the GNU General Public License
+        #    along with this program.  If not, see [http://www.gnu.org/licenses/].
+        #
+        ##############################################################################
+
         <record id="action_partial_container" model="ir.actions.act_window">
             <field name="name">Process Container</field>
             <field name="res_model">stock.partial.container</field>
             <field name="view_type">form</field>
             <field name="view_mode">form</field>
             <field name="target">new</field>
+        </record>
+
+        <record id="stock_partial_container_form" model="ir.ui.view">
+            <field name="name">stock.partial.container.form</field>
+            <field name="model">stock.partial.container</field>
+            <field name="type">form</field>
+            <field name="arch" type="xml">
+                <form>
+                    <field name="date"/>
+                    <separator colspan="4" string="Products"/>
+                    <field name="move_ids" colspan="4" nolabel="1" mode="tree,form" width="550" height="200"/>
+                    <group col="2" colspan="2">
+                        <button icon='gtk-cancel' special="cancel" string="_Cancel" />
+                        <button name="do_partial" string="_Validate" colspan="1" type="object" icon="gtk-go-forward" />
+                    </group>
+                </form>
+            </field>
         </record>
 
     </data>
