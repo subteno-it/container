@@ -28,6 +28,7 @@ from osv import fields
 from datetime import datetime, timedelta
 from tools.translate import _
 import netsvc
+import itertools
 
 
 class stock_container(osv.osv):
@@ -208,13 +209,13 @@ class stock_container(osv.osv):
         """
         Action lanched when the user want to revert in draft
         """
+        container_moves = list(itertools.chain.from_iterable([container.move_line_ids for container in self.browse(cr, uid, ids, context=context)]))
+        for move in container_moves:
+            # Restore the source location on incoming moves
+            move.move_dest_id.write({'location_id': move.location_id.id}, context=context)
 
-        for container in self.browse(cr, uid, ids, context=context):
-            # Chek if the user filled picking in in this container before booking
-            if container.move_line_ids:
-                # Read incoming move list
-                move_ids = [move.id for move in container.move_line_ids]
-                self.pool.get('stock.move').unlink(cr, uid, move_ids, context=context)
+        # Delete the container moves
+        self.pool.get('stock.move').unlink(cr, uid, [move.id for move in container_moves], context=context)
 
         return True
 
