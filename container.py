@@ -199,7 +199,7 @@ class stock_container(osv.osv):
         """
         Disable Container deletion when not in draft
         """
-        if [container.id for container in self.browse(cr, uid, ids, context=context) if container.state == 'draft']:
+        if [container.id for container in self.browse(cr, uid, ids, context=context) if container.state != 'draft']:
             raise osv.except_osv(_('Error'), _('A container must be in state draft to be deleted !'))
 
         res = super(stock_container, self).unlink(cr, uid, ids, context=context)
