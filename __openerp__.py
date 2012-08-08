@@ -34,6 +34,7 @@
         'product',
         'sale',
         'stock',
+        'wms',
         'sale_order_date_delivery',
     ],
     'init_xml': [],
