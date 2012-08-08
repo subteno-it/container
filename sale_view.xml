@@ -31,7 +31,7 @@
             <field name="priority" eval="8"/>
             <field name="inherit_id" ref="sale.view_order_form"/>
             <field name="arch" type="xml">
-                <xpath expr="/form/notebook/page/field[@name='order_line']/form/notebook/page/field[@name='product_packaging']" position="after">
+                <xpath expr="/form/notebook/page/field[@name='order_line']/form/notebook/page/group/field[@name='product_packaging']" position="after">
                     <field name="container_id"/>
                 </xpath>
             </field>
