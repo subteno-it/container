@@ -69,6 +69,10 @@ class stock_partial_container(osv.osv_memory):
 
         return res
 
+    _columns = {
+        'move_ids' : fields.one2many('stock.partial.container.line', 'wizard_id', 'Moves'),
+     }
+
     def do_partial(self, cr, uid, ids, context=None):
         """ Makes partial moves and pickings done.
         @param self: The object pointer.
