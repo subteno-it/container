@@ -406,7 +406,7 @@ msgstr "Transport"
 #: view:stock.container:0
 #: selection:stock.container,state:0
 msgid "Cancel"
-msgstr "Annulé"
+msgstr "Annuler"
 
 #. module: container
 #: model:ir.model,name:container.model_sale_order

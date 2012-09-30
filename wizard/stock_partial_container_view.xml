@@ -40,7 +40,15 @@
                 <form>
                     <field name="date"/>
                     <separator colspan="4" string="Products"/>
-                    <field name="move_ids" colspan="4" nolabel="1" mode="tree,form" width="550" height="200"/>
+                    <field name="move_ids" colspan="4" nolabel="1" mode="tree,form" width="550" height="200" context="{'hide_tracking': hide_tracking}">
+                        <tree editable="bottom" string="Product Moves">
+                            <field name="product_id" />
+                            <field name="quantity" />
+                            <field name="product_uom" />
+                            <field name="tracking" invisible="1"/>
+                            <field name="prodlot_id" domain="[('product_id', '=', product_id)]" invisible="context.get('hide_tracking',False)" attrs="{'required':[('tracking','=',True)]}"/>
+                        </tree>
+                    </field>
                     <group col="2" colspan="2">
                         <button icon='gtk-cancel' special="cancel" string="_Cancel" />
                         <button name="do_partial" string="_Validate" colspan="1" type="object" icon="gtk-go-forward" />
