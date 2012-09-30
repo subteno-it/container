@@ -4,6 +4,7 @@
 #    container module for OpenERP, Manages containers receipt
 #    Copyright (C) 2011 SYLEAM Info Services (<http://www.Syleam.fr/>)
 #              Sylvain Garancher <sylvain.garancher@syleam.fr>
+#              Sebastien LANGE <sebastien.lange@syleam.fr>
 #
 #    This file is a part of container
 #
@@ -40,21 +41,17 @@ class stock_container(osv.osv):
         Computes weight, volume and remaining volume values
         """
         res = {}
-
         for container in self.browse(cr, uid, ids, context=context):
             weight = volume = 0.
-
             # Add values from each move
             for move in container.incoming_move_list_ids:
                 weight += move.product_qty * move.product_id.weight_net
                 volume += move.product_qty * move.product_id.volume
-
             res[container.id] = {
                 'weight': weight,
                 'volume': volume,
                 'remaining_volume': container.product_id.volume - volume,
             }
-
         return res
 
     _columns = {
@@ -138,12 +135,10 @@ class stock_container(osv.osv):
         Modify container's dates from moves dates
         """
         container = self.browse(cr, uid, container_id, context=context)
-
         # Get the highest date of the moves
         moves_list = [datetime.strptime(move.date, '%Y-%m-%d %H:%M:%S') for move in container.move_line_ids]
         if not moves_list:
             return {}
-
         # Compute dates values
         date_etm = max(moves_list)
         eta_date = date_etm - timedelta(container.product_id.produce_delay or 0)
@@ -155,7 +150,6 @@ class stock_container(osv.osv):
             'etm_date': date_etm.strftime('%Y-%m-%d'),
             'rdv_date': date_etm.strftime('%Y-%m-%d'),
         }
-
         return values
 
     def write(self, cr, uid, ids, values, context=None):
@@ -163,47 +157,36 @@ class stock_container(osv.osv):
         Write method
         """
         res_users_obj = self.pool.get('res.users')
-
         company = res_users_obj.browse(cr, uid, uid, context=context).company_id
-
         for container in self.browse(cr, uid, ids, context=context):
             # Write new dates on container
             new_dates = self.get_dates_from_moves(cr, uid, container.id, context=context)
-
             etd_date = values.get('etd_date', False) or container.etd_date or new_dates.get('etd_date', False)
             if etd_date:
                 values['etd_date'] = etd_date,
-
             eta_date = values.get('eta_date', False) or container.eta_date or new_dates.get('eta_date', False)
             if eta_date:
                 values['eta_date'] = eta_date,
-
             etm_date = values.get('etm_date', False) or container.etm_date or new_dates.get('etm_date', False)
             if etm_date:
                 values['etm_date'] = etm_date,
-
             rdv_date = values.get('rdv_date', False) or container.rdv_date or new_dates.get('rdv_date', False)
             if rdv_date:
                 values['rdv_date'] = rdv_date,
-
             res = super(stock_container, self).write(cr, uid, [container.id], values, context=context)
-
             if company.container_updates_dates:
                 # Adjusts dates on moves
                 if values.get('state', container.state) not in ('draft', 'booking'):
                     stock_move_obj = self.pool.get('stock.move')
                     stock_picking_obj = self.pool.get('stock.picking')
-
                     move_ids = [move.id for move in container.move_line_ids]
                     stock_move_obj.write(cr, uid, move_ids, {'date': values.get('etm_date', container.etm_date)}, context=context)
-
                     # Search pickings to update their planned date
                     stock_move_data = stock_move_obj.read(cr, uid, move_ids, ['picking_id'], context=context)
                     picking_ids = [data['picking_id'][0] for data in stock_move_data if data.get('picking_id', False)]
                     for picking in stock_picking_obj.browse(cr, uid, picking_ids, context=context):
                         new_date = max([datetime.strptime(move.date, '%Y-%m-%d %H:%M:%S') for move in picking.move_lines])
                         picking.write({'min_date': new_date.strftime('%Y-%m-%d')}, context=context)
-
         return res
 
     def unlink(self, cr, uid, ids, context=None):
@@ -212,9 +195,7 @@ class stock_container(osv.osv):
         """
         if [container.id for container in self.browse(cr, uid, ids, context=context) if container.state != 'draft']:
             raise osv.except_osv(_('Error'), _('A container must be in state draft to be deleted !'))
-
-        res = super(stock_container, self).unlink(cr, uid, ids, context=context)
-        return res
+        return super(stock_container, self).unlink(cr, uid, ids, context=context)
 
     def action_draft(self, cr, uid, ids, context=None):
         """
@@ -224,10 +205,8 @@ class stock_container(osv.osv):
         for move in container_moves:
             # Restore the source location on incoming moves
             move.move_dest_id.write({'location_id': move.location_id.id}, context=context)
-
         # Delete the container moves
         self.pool.get('stock.move').unlink(cr, uid, [move.id for move in container_moves], context=context)
-
         return True
 
     def action_booking(self, cr, uid, ids, context=None):
@@ -237,9 +216,7 @@ class stock_container(osv.osv):
         if context is None:
             # There is no context in workflow, so get it on user
             context = self.pool.get('res.users').context_get(cr, uid, context=context)
-
         stock_move_obj = self.pool.get('stock.move')
-
         for container in self.browse(cr, uid, ids, context=context):
             # Check container's location
             #if container.incoterm_id.code in ['EXW', 'FCA', 'FAS', 'FOB', 'CFR', 'CIF', 'CPT', 'CIP'] and container.container_stock_location_id.usage != 'internal':
@@ -249,15 +226,12 @@ class stock_container(osv.osv):
             #FIXME : In version 6, we must have the stock location in internal else impossible to create invoice supplier
             if container.container_stock_location_id.usage != 'supplier':
                 raise osv.except_osv(_('Warning !'), _('You must define container stock location as supplier location !'))
-
             # Check remaining volume
             if container.remaining_volume < 0:
                 raise osv.except_osv(_('Warning !'), _('Remaining volume must be positive !'))
-
             # Chek if the user filled picking in in this container before booking
             if not container.incoming_move_list_ids:
                 raise osv.except_osv(_('Warning !'), _('You must select incoming shipmets before booking !'))
-
             # Create outgoing moves from incoming moves
             default = {
                 'state': 'draft',
@@ -269,13 +243,10 @@ class stock_container(osv.osv):
                 default['move_dest_id'] = move.id
                 # Create the new move
                 stock_move_obj.copy(cr, uid, move.id, default, context=context)
-
             # Read incoming move list
             move_ids = [move.id for move in container.incoming_move_list_ids]
-
             # Changes incoming moves' location to container's location
             stock_move_obj.write(cr, uid, move_ids, {'location_id': container.container_stock_location_id.id}, context=context)
-
         return True
 
     def action_freight(self, cr, uid, ids, context=None):
@@ -284,10 +255,8 @@ class stock_container(osv.osv):
         """
         if context is None:
             context = {}
-
         ctx = dict(context, active_ids=ids, active_model=self._name)
         partial_id = self.pool.get('stock.partial.container').create(cr, uid, {}, context=ctx)
-
         return {
             'name': _("Products to Process"),
             'view_mode': 'form',
@@ -321,12 +290,10 @@ class stock_container(osv.osv):
         if context is None:
             # There is no context in workflow, so get it on user
             context = self.pool.get('res.users').context_get(cr, uid, context=context)
-
         for container in self.browse(cr, uid, ids, context=context):
             # Error if one of the incoming pickings is in cancel state
             if [move.picking_id.id for move in container.incoming_move_list_ids if move.picking_id.state != 'cancel']:
                 raise osv.except_osv(_('Warning !'), _('Incoming or outgoing packing list not in cancel state !'))
-
         return True
 
     def action_deliver(self, cr, uid, ids, context=None):
@@ -336,13 +303,11 @@ class stock_container(osv.osv):
         if context is None:
             context = {}
         wf_service = netsvc.LocalService("workflow")
-
         for container in self.browse(cr, uid, ids, context=context):
             picking_ids = [move.picking_id.id for move in container.incoming_move_list_ids]
             wf_service.trg_validate(uid, 'stock.container', container.id, 'button_deliver', cr)
 
         partial_id = self.pool.get("stock.partial.picking").create(cr, uid, {}, context=dict(context, active_ids=picking_ids, active_model='stock.picking', container_ids=ids))
-
         return {
             'name': _("Products to Process"),
             'view_mode': 'form',
@@ -361,12 +326,10 @@ class stock_container(osv.osv):
         """
         Removes some values to avoid creating duplicate pickings
         """
-
         default = {
             'incoming_move_list_ids': [],
             'move_line_ids': [],
         }
-
         return super(stock_container, self).copy(cr, uid, id, default, context=context)
 
     def onchange_etd_date(self, cr, uid, ids, new_date, context=None):
@@ -377,7 +340,6 @@ class stock_container(osv.osv):
         for container in self.browse(cr, uid, ids, context=context):
             etm_date = date_etd + timedelta(container.product_id.sale_delay or 0)
             eta_date = etm_date - timedelta(container.product_id.produce_delay or 0)
-
         return {'value': {
             'eta_date': eta_date.strftime('%Y-%m-%d'),
             'etm_date': etm_date.strftime('%Y-%m-%d'),
