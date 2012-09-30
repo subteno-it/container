@@ -52,22 +52,16 @@ class stock_partial_container(osv.osv_memory):
         """
         if context is None:
             context = {}
-
-        res = {}
         container_ids = context.get('active_ids', [])
         if not container_ids or context.get('active_model') != 'stock.container':
-            return res
-
+            return {}
         # Retrieve the list of moves to use
         container_obj = self.pool.get('stock.container')
         move_ids = [move.id for move in itertools.chain.from_iterable(
             [container.move_line_ids for container in container_obj.browse(cr, uid, container_ids, context=context)]
         ) if move.state == 'draft']
-
         # Call to super to create the moves in a good way
-        res = super(stock_partial_container, self).default_get(cr, uid, fields, context=dict(context, active_ids=move_ids, active_model='stock.move'))
-
-        return res
+        return super(stock_partial_container, self).default_get(cr, uid, fields, context=dict(context, active_ids=move_ids, active_model='stock.move'))
 
     _columns = {
         'move_ids' : fields.one2many('stock.partial.container.line', 'wizard_id', 'Moves'),
@@ -85,20 +79,16 @@ class stock_partial_container(osv.osv_memory):
         container_obj = self.pool.get('stock.container')
         move_obj = self.pool.get('stock.move')
         wf_service = netsvc.LocalService("workflow")
-
         container_ids = context.get('active_ids', False)
         partial = self.browse(cr, uid, ids[0], context=context)
-
         for container in container_obj.browse(cr, uid, container_ids, context=context):
             moves_list = partial.move_ids
             for move in moves_list:
                 #Adding a check whether any line has been added with new qty
                 if not move.move_id:
                     raise osv.except_osv(_('Processing Error'), _('You cannot add any new move while validating the container, rather you can split the lines prior to validation!'))
-
                 if move.move_id.product_uom.id != move.product_uom.id:
                     raise osv.except_osv(_('Processing Error'), _('You cannot change Unit of product!'))
-
                 move_obj.write(cr, uid, [move.move_id.id], {
                     'product_qty': move.quantity,
                     'date': partial.date,
@@ -107,7 +97,6 @@ class stock_partial_container(osv.osv_memory):
                 new_dates = container_obj.get_dates_from_moves(cr, uid, container.id, context=context)
                 container_obj.write(cr, uid, [container.id], new_dates, context=context)
                 wf_service.trg_validate(uid, 'stock.container', container.id, 'button_freight', cr)
-
         return {'type': 'ir.actions.act_window_close'}
 
 stock_partial_container()
