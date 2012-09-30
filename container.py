@@ -199,7 +199,7 @@ class stock_container(osv.osv):
 
     def action_draft(self, cr, uid, ids, context=None):
         """
-        Action lanched when the user want to revert in draft
+        Action launched when the user want to revert in draft
         """
         container_moves = list(itertools.chain.from_iterable([container.move_line_ids for container in self.browse(cr, uid, ids, context=context)]))
         for move in container_moves:
@@ -211,7 +211,7 @@ class stock_container(osv.osv):
 
     def action_booking(self, cr, uid, ids, context=None):
         """
-        Action lanched when arriving on booking state
+        Action launched when arriving on booking state
         """
         if context is None:
             # There is no context in workflow, so get it on user
@@ -231,7 +231,7 @@ class stock_container(osv.osv):
                 raise osv.except_osv(_('Warning !'), _('Remaining volume must be positive !'))
             # Chek if the user filled picking in in this container before booking
             if not container.incoming_move_list_ids:
-                raise osv.except_osv(_('Warning !'), _('You must select incoming shipmets before booking !'))
+                raise osv.except_osv(_('Warning !'), _('You must select incoming shipments before booking !'))
             # Create outgoing moves from incoming moves
             default = {
                 'state': 'draft',
@@ -251,7 +251,7 @@ class stock_container(osv.osv):
 
     def action_freight(self, cr, uid, ids, context=None):
         """
-        Action lanched when arriving on freight state
+        Action launched when arriving on freight state
         """
         if context is None:
             context = {}
@@ -273,19 +273,19 @@ class stock_container(osv.osv):
 
     def action_clearance(self, cr, uid, ids, context=None):
         """
-        Action lanched when arriving on clearance state
+        Action launched when arriving on clearance state
         """
         return True
 
     def action_unpacking(self, cr, uid, ids, context=None):
         """
-        Action lanched when arriving on unpacking state
+        Action launched when arriving on unpacking state
         """
         return True
 
     def action_cancel(self, cr, uid, ids, context=None):
         """
-        Action lanched when arriving on cancel state
+        Action launched when arriving on cancel state
         """
         if context is None:
             # There is no context in workflow, so get it on user
@@ -298,7 +298,7 @@ class stock_container(osv.osv):
 
     def action_deliver(self, cr, uid, ids, context=None):
         """
-        Action lanched when arriving on delivered state
+        Action launched when arriving on delivered state
         """
         if context is None:
             context = {}

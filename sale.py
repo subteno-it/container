@@ -38,8 +38,8 @@ class sale_order(osv.osv):
         """
         res = super(sale_order, self).action_ship_create(cr, uid, ids, context)
         for order in self.browse(cr, uid, ids, context=context):
-            for sale_order_line in order.order_line:
-                sale_order_line.check_container_availability(context=context)
+            for line in order.order_line:
+                line.check_container_availability(context=context)
         return res
 
 sale_order()
