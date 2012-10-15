@@ -42,6 +42,7 @@
     'update_xml': [
         'security/ir.model.access.csv',
         #'wizard/wizard.xml',
+        'container_sequence.xml',
         'product_data.xml',
         'stock_data.xml',
         'workflow/workflow.xml',

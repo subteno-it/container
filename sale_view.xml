@@ -6,6 +6,7 @@
         #    container module for OpenERP, Manages containers receipt
         #    Copyright (C) 2011 SYLEAM Info Services ([http://www.Syleam.fr/]) 
         #              Sylvain Garancher [sylvain.garancher@syleam.fr]
+        #              Sebastien LANGE [sebastien.lange@syleam.fr]
         #
         #    This file is a part of container
         #
@@ -32,7 +33,9 @@
             <field name="inherit_id" ref="sale.view_order_form"/>
             <field name="arch" type="xml">
                 <xpath expr="/form/notebook/page/field[@name='order_line']/form/notebook/page/group/field[@name='product_packaging']" position="after">
-                    <field name="container_id"/>
+                    <field name="container_id" domain="[('state','not in', ('delivered', 'cancel')), ('products_in_container_id', '=', product_id)]"
+                        on_change="onchange_check_product_on_container(product_id, container_id, product_uom_qty)"
+                        context="{'product_id': product_id}"/>
                 </xpath>
             </field>
         </record>

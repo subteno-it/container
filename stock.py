@@ -30,9 +30,36 @@ from osv import fields
 class stock_move(osv.osv):
     _inherit = 'stock.move'
 
+    def _check_tracking(self, cr, uid, ids, context=None):
+        """ Checks if production lot is assigned to stock move or not.
+        @return: True or False
+        """
+        move_ids = []
+        for move in self.browse(cr, uid, ids, context=context):
+            if not move.container_id:
+                move_ids.append(move.id)
+        if move_ids:
+            return super(stock_move, self)._check_tracking(cr, uid, move_ids, context=context)
+        return True
+
     _columns = {
         'container_id': fields.many2one('stock.container', 'Container', help='Container of this move'),
     }
+
+    _constraints = [
+        (_check_tracking,
+            'You must assign a production lot for this product',
+            ['prodlot_id'])]
+
+    def do_partial(self, cr, uid, ids, partial_datas, context=None):
+        if context is None:
+            context = {}
+        move_ids = super(stock_move, self).do_partial(cr, uid, ids, partial_datas, context=context)
+        container_id = context.get('container_id', False)
+        if container_id:
+            container_obj = self.pool.get('stock.container')
+            move_ids.extend([move.id for move in container_obj.browse(cr, uid, container_id, context=context).incoming_move_list_ids])
+            container_obj.write(cr, uid, [container_id], {'incoming_move_list_ids': [(6, 0, list(set(move_ids)))]}, context=context)
 
 stock_move()
 
@@ -64,6 +91,16 @@ class stock_picking(osv.osv):
         return res
 
 stock_picking()
+
+
+class stock_warehouse(osv.osv):
+    _inherit = 'stock.warehouse'
+
+    _columns = {
+        'lot_container_id': fields.many2one('stock.location', 'Container location', help='Container location for reservation'),
+    }
+
+stock_warehouse()
 
 
 # vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:

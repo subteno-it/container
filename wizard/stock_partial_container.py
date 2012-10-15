@@ -29,8 +29,19 @@ import netsvc
 class stock_partial_container_line(osv.osv_memory):
     _name = "stock.partial.container.line"
     _inherit = "stock.partial.move.line"
+    def _tracking(self, cursor, user, ids, name, arg, context=None):
+        res = {}
+        for tracklot in self.browse(cursor, user, ids, context=context):
+            tracking = False
+            if not tracklot.move_id.container_id and ((tracklot.move_id.picking_id.type == 'in' and tracklot.product_id.track_incoming == True) or \
+                (tracklot.move_id.picking_id.type == 'out' and tracklot.product_id.track_outgoing == True)):
+                tracking = True
+            res[tracklot.id] = tracking
+        return res
+
     _columns = {
-        'wizard_id' : fields.many2one('stock.partial.container', string="Wizard", ondelete='CASCADE'),
+        'wizard_id': fields.many2one('stock.partial.container', string="Wizard", ondelete='CASCADE'),
+        'tracking': fields.function(_tracking, string='Tracking', type='boolean'),
     }
 
 stock_partial_container_line()
@@ -43,29 +54,47 @@ class stock_partial_container(osv.osv_memory):
 
     def default_get(self, cr, uid, fields, context=None):
         """ To get default values for the object.
-         @param self: The object pointer.
-         @param cr: A database cursor
-         @param uid: ID of the user currently logged in
-         @param fields: List of fields for which we want default values
-         @param context: A standard dictionary
-         @return: A dictionary which of fields with values.
+        :param self: The object pointer.
+        :param cr: A database cursor
+        :param uid: ID of the user currently logged in
+        :param fields: List of fields for which we want default values
+        :param context: A standard dictionary
+        :return: A dictionary which of fields with values.
         """
         if context is None:
             context = {}
+
         container_ids = context.get('active_ids', [])
         if not container_ids or context.get('active_model') != 'stock.container':
             return {}
-        # Retrieve the list of moves to use
+
+        # Retrieve the list of moves to use, and group them by product, and specify reserve quantity
         container_obj = self.pool.get('stock.container')
+
+        # Could not easy fix the situation with reserved product
+        #product_group = {}
+        #move_ids = []
+        #for container in container_obj.browse(cr, uid, container_ids, context=context):
+        #    for line in container.move_line_ids:
+        #        if product_group.get(line.product_id.id):
+        #            product_group[line.product_id.id][0] += line.product_qty
+        #            # if move have move_dest_id, it is for reserved product
+        #            if line.move_dest_id:
+        #                product_group[line.product_id.id][1] += line.product_qty
+        #        else:
+        #            # we store the quantity and reserved qty
+        #            product_group[line.product_id.id] = [line.product_qty, 0]
+
         move_ids = [move.id for move in itertools.chain.from_iterable(
             [container.move_line_ids for container in container_obj.browse(cr, uid, container_ids, context=context)]
         ) if move.state == 'draft']
+
         # Call to super to create the moves in a good way
         return super(stock_partial_container, self).default_get(cr, uid, fields, context=dict(context, active_ids=move_ids, active_model='stock.move'))
 
     _columns = {
-        'move_ids' : fields.one2many('stock.partial.container.line', 'wizard_id', 'Moves'),
-     }
+        'move_ids': fields.one2many('stock.partial.container.line', 'wizard_id', 'Moves'),
+    }
 
     def do_partial(self, cr, uid, ids, context=None):
         """ Makes partial moves and pickings done.
@@ -94,9 +123,10 @@ class stock_partial_container(osv.osv_memory):
                     'date': partial.date,
                     'state': 'done',
                 })
-                new_dates = container_obj.get_dates_from_moves(cr, uid, container.id, context=context)
-                container_obj.write(cr, uid, [container.id], new_dates, context=context)
-                wf_service.trg_validate(uid, 'stock.container', container.id, 'button_freight', cr)
+            new_dates = container_obj.get_dates_from_moves(cr, uid, container.id, context=context)
+            container_obj.write(cr, uid, [container.id], new_dates, context=context)
+            wf_service.trg_validate(uid, 'stock.container', container.id, 'button_freight', cr)
+
         return {'type': 'ir.actions.act_window_close'}
 
 stock_partial_container()

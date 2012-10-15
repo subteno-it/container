@@ -30,6 +30,7 @@ from datetime import datetime, timedelta
 from tools.translate import _
 import netsvc
 import itertools
+from tools import DEFAULT_SERVER_DATE_FORMAT, DEFAULT_SERVER_DATETIME_FORMAT
 
 
 class stock_container(osv.osv):
@@ -124,10 +125,14 @@ class stock_container(osv.osv):
   - Unpacking : The container is being unpacked at its final destination
   - Delivered : the container is archived with all fields locked"""),
         'prod_serial': fields.related('product_id', 'code', type='char', string='Product serial no.', help='Serial number of the product'),
+        'products_in_container_id': fields.related('move_line_ids', 'product_id', type='many2one', relation='stock.move', string='Products in container', help='Products in the container'),
+        'stock_virtual': fields.related('container_stock_location_id', 'stock_virtual', type='float', string='Virtual Stock', help='Virtual Stock for a product'),
+        'stock_real': fields.related('container_stock_location_id', 'stock_real', type='float', string='Real Stock', help='Real Stock for a product'),
     }
 
     _defaults = {
         'state': 'draft',
+        'name': lambda obj, cr, uid, context: obj.pool.get('ir.sequence').get(cr, uid, 'stock.container'),
     }
 
     def get_dates_from_moves(self, cr, uid, container_id, context=None):
@@ -136,7 +141,7 @@ class stock_container(osv.osv):
         """
         container = self.browse(cr, uid, container_id, context=context)
         # Get the highest date of the moves
-        moves_list = [datetime.strptime(move.date, '%Y-%m-%d %H:%M:%S') for move in container.move_line_ids]
+        moves_list = [datetime.strptime(move.date, DEFAULT_SERVER_DATETIME_FORMAT) for move in container.move_line_ids]
         if not moves_list:
             return {}
         # Compute dates values
@@ -145,10 +150,10 @@ class stock_container(osv.osv):
         etd_date = date_etm - timedelta(container.product_id.sale_delay or 0)
         # Set container's default dates
         values = {
-            'etd_date': etd_date.strftime('%Y-%m-%d'),
-            'eta_date': eta_date.strftime('%Y-%m-%d'),
-            'etm_date': date_etm.strftime('%Y-%m-%d'),
-            'rdv_date': date_etm.strftime('%Y-%m-%d'),
+            'etd_date': etd_date.strftime(DEFAULT_SERVER_DATE_FORMAT),
+            'eta_date': eta_date.strftime(DEFAULT_SERVER_DATE_FORMAT),
+            'etm_date': date_etm.strftime(DEFAULT_SERVER_DATE_FORMAT),
+            'rdv_date': date_etm.strftime(DEFAULT_SERVER_DATE_FORMAT),
         }
         return values
 
@@ -181,12 +186,12 @@ class stock_container(osv.osv):
                     stock_picking_obj = self.pool.get('stock.picking')
                     move_ids = [move.id for move in container.move_line_ids]
                     stock_move_obj.write(cr, uid, move_ids, {'date': values.get('etm_date', container.etm_date)}, context=context)
-                    # Search pickings to update their planned date
+                    # Search related pickings to update their planned date
                     stock_move_data = stock_move_obj.read(cr, uid, move_ids, ['picking_id'], context=context)
                     picking_ids = [data['picking_id'][0] for data in stock_move_data if data.get('picking_id', False)]
                     for picking in stock_picking_obj.browse(cr, uid, picking_ids, context=context):
-                        new_date = max([datetime.strptime(move.date, '%Y-%m-%d %H:%M:%S') for move in picking.move_lines])
-                        picking.write({'min_date': new_date.strftime('%Y-%m-%d')}, context=context)
+                        new_date = max([datetime.strptime(move.date, DEFAULT_SERVER_DATETIME_FORMAT) for move in picking.move_lines])
+                        picking.write({'min_date': new_date.strftime(DEFAULT_SERVER_DATE_FORMAT)}, context=context)
         return res
 
     def unlink(self, cr, uid, ids, context=None):
@@ -255,7 +260,7 @@ class stock_container(osv.osv):
         """
         if context is None:
             context = {}
-        ctx = dict(context, active_ids=ids, active_model=self._name)
+        ctx = dict(context, active_ids=ids, active_model=self._name, hide_tracking=True)
         partial_id = self.pool.get('stock.partial.container').create(cr, uid, {}, context=ctx)
         return {
             'name': _("Products to Process"),
@@ -298,29 +303,22 @@ class stock_container(osv.osv):
 
     def action_deliver(self, cr, uid, ids, context=None):
         """
-        Action launched when arriving on delivered state
+        Makes partial picking and moves done.
         """
-        if context is None:
-            context = {}
+        move_obj = self.pool.get('stock.move')
         wf_service = netsvc.LocalService("workflow")
         for container in self.browse(cr, uid, ids, context=context):
-            picking_ids = [move.picking_id.id for move in container.incoming_move_list_ids]
-            wf_service.trg_validate(uid, 'stock.container', container.id, 'button_deliver', cr)
+            # Search all reserved lines for this container
+            move_ids = move_obj.search(cr, uid, [
+                ('container_id', '=', container.id),
+                ('location_id', '=', container.container_stock_location_id.id),
+            ], context=context)
+            if move_ids:
+                move_obj.write(cr, uid, move_ids, {'location_id': container.destination_warehouse_id.lot_stock_id.id}, context=context)
+                move_obj.action_done(cr, uid, move_ids, context=context)
 
-        partial_id = self.pool.get("stock.partial.picking").create(cr, uid, {}, context=dict(context, active_ids=picking_ids, active_model='stock.picking', container_ids=ids))
-        return {
-            'name': _("Products to Process"),
-            'view_mode': 'form',
-            'view_id': False,
-            'view_type': 'form',
-            'res_model': 'stock.partial.picking',
-            'res_id': partial_id,
-            'type': 'ir.actions.act_window',
-            'nodestroy': True,
-            'target': 'new',
-            'domain': '[]',
-            'context': dict(context, active_ids=picking_ids, container_ids=ids)
-        }
+            wf_service.trg_validate(uid, 'stock.container', container.id, 'button_deliver', cr)
+        return True
 
     def copy(self, cr, uid, id, default=None, context=None):
         """
@@ -336,60 +334,67 @@ class stock_container(osv.osv):
         """
         Change date of container
         """
-        date_etd = datetime.strptime(new_date, '%Y-%m-%d')
+        if not ids:
+            return {}
+        date_etd = datetime.strptime(new_date, DEFAULT_SERVER_DATE_FORMAT)
         for container in self.browse(cr, uid, ids, context=context):
             etm_date = date_etd + timedelta(container.product_id.sale_delay or 0)
             eta_date = etm_date - timedelta(container.product_id.produce_delay or 0)
         return {'value': {
-            'eta_date': eta_date.strftime('%Y-%m-%d'),
-            'etm_date': etm_date.strftime('%Y-%m-%d'),
-            'rdv_date': etm_date.strftime('%Y-%m-%d'),
+            'eta_date': eta_date.strftime(DEFAULT_SERVER_DATE_FORMAT),
+            'etm_date': etm_date.strftime(DEFAULT_SERVER_DATE_FORMAT),
+            'rdv_date': etm_date.strftime(DEFAULT_SERVER_DATE_FORMAT),
         }}
 
     def onchange_eta_date(self, cr, uid, ids, new_date, context=None):
         """
         Change date of container
         """
-        date_eta = datetime.strptime(new_date, '%Y-%m-%d')
+        if not ids:
+            return {}
+        date_eta = datetime.strptime(new_date, DEFAULT_SERVER_DATE_FORMAT)
         for container in self.browse(cr, uid, ids, context=context):
             etm_date = date_eta + timedelta(container.product_id.produce_delay or 0)
             if container.state in ('draft', 'booking'):
                 etd_date = etm_date - timedelta(container.product_id.sale_delay or 0)
                 return {'value': {
-                    'etd_date': etd_date.strftime('%Y-%m-%d'),
-                    'etm_date': etm_date.strftime('%Y-%m-%d'),
-                    'rdv_date': etm_date.strftime('%Y-%m-%d'),
+                    'etd_date': etd_date.strftime(DEFAULT_SERVER_DATE_FORMAT),
+                    'etm_date': etm_date.strftime(DEFAULT_SERVER_DATE_FORMAT),
+                    'rdv_date': etm_date.strftime(DEFAULT_SERVER_DATE_FORMAT),
                 }}
             return {'value': {
-                'etm_date': etm_date.strftime('%Y-%m-%d'),
-                'rdv_date': etm_date.strftime('%Y-%m-%d'),
+                'etm_date': etm_date.strftime(DEFAULT_SERVER_DATE_FORMAT),
+                'rdv_date': etm_date.strftime(DEFAULT_SERVER_DATE_FORMAT),
             }}
 
     def onchange_etm_date(self, cr, uid, ids, new_date, context=None):
         """
         Change date of container
         """
-        date_etm = datetime.strptime(new_date, '%Y-%m-%d')
+        if not ids:
+            return {}
+        date_etm = datetime.strptime(new_date, DEFAULT_SERVER_DATE_FORMAT)
         for container in self.browse(cr, uid, ids, context=context):
             if container.state in ('draft', 'booking'):
                 eta_date = date_etm - timedelta(container.product_id.produce_delay or 0)
                 etd_date = date_etm - timedelta(container.product_id.sale_delay or 0)
                 return {'value': {
-                    'eta_date': eta_date.strftime('%Y-%m-%d'),
-                    'etd_date': etd_date.strftime('%Y-%m-%d'),
-                    'rdv_date': date_etm.strftime('%Y-%m-%d'),
+                    'eta_date': eta_date.strftime(DEFAULT_SERVER_DATE_FORMAT),
+                    'etd_date': etd_date.strftime(DEFAULT_SERVER_DATE_FORMAT),
+                    'rdv_date': date_etm.strftime(DEFAULT_SERVER_DATE_FORMAT),
                 }}
             elif container.state == 'freight':
                 etd_date = date_etm - timedelta(container.product_id.sale_delay or 0)
                 return {'value': {
-                    'etd_date': etd_date.strftime('%Y-%m-%d'),
-                    'rdv_date': date_etm.strftime('%Y-%m-%d'),
+                    'etd_date': etd_date.strftime(DEFAULT_SERVER_DATE_FORMAT),
+                    'rdv_date': date_etm.strftime(DEFAULT_SERVER_DATE_FORMAT),
                 }}
             else:
                 return {'value': {
-                    'rdv_date': date_etm.strftime('%Y-%m-%d'),
+                    'rdv_date': date_etm.strftime(DEFAULT_SERVER_DATE_FORMAT),
                 }}
 
 stock_container()
+
 
 # vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:

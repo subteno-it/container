@@ -4,10 +4,10 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: OpenERP Server 6.0.2\n"
-"Report-Msgid-Bugs-To: support@openerp.com\n"
-"POT-Creation-Date: 2011-09-11 07:56+0000\n"
-"PO-Revision-Date: 2011-09-11 07:56+0000\n"
+"Project-Id-Version: OpenERP Server 6.1\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2012-10-08 09:09+0000\n"
+"PO-Revision-Date: 2012-10-08 09:09+0000\n"
 "Last-Translator: <>\n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -16,124 +16,8 @@ msgstr ""
 "Plural-Forms: \n"
 
 #. module: container
-#: view:stock.container:0
-#: selection:stock.container,state:0
-msgid "Delivered"
-msgstr ""
-
-#. module: container
 #: field:stock.container,remaining_volume:0
 msgid "Remaining Volume"
-msgstr ""
-
-#. module: container
-#: view:stock.container:0
-#: model:ir.actions.act_window,name:container.act_open_stock_container_view
-#: model:ir.model,name:container.model_stock_container
-#: model:ir.ui.menu,name:container.menu_stock_container
-#: model:product.category,name:container.product_category_container
-#: view:res.company:0
-#: field:sale.order.line,container_id:0
-#: field:stock.move,container_id:0
-msgid "Container"
-msgstr ""
-
-#. module: container
-#: constraint:res.company:0
-msgid "Error! You can not create recursive companies."
-msgstr ""
-
-#. module: container
-#: help:stock.move,container_id:0
-msgid "Container of this move"
-msgstr ""
-
-#. module: container
-#: field:res.company,container_updates_dates:0
-msgid "Container Updates Dates"
-msgstr ""
-
-#. module: container
-#: model:ir.actions.act_window,name:container.act_open_container_stock_available
-msgid "Container stock available"
-msgstr ""
-
-#. module: container
-#: view:stock.container:0
-#: selection:stock.container,state:0
-msgid "Draft"
-msgstr ""
-
-#. module: container
-#: view:stock.container:0
-msgid "Location"
-msgstr ""
-
-#. module: container
-#: field:stock.container,partner_id:0
-msgid "Freight Broker"
-msgstr ""
-
-#. module: container
-#: help:sale.order.line,container_id:0
-msgid "Container of this sale order line"
-msgstr ""
-
-#. module: container
-#: view:stock.container:0
-#: selection:stock.container,state:0
-msgid "Booking"
-msgstr ""
-
-#. module: container
-#: view:stock.move:0
-msgid "Stock moves"
-msgstr ""
-
-#. module: container
-#: field:stock.container,state:0
-msgid "Status"
-msgstr ""
-
-#. module: container
-#: field:stock.container,incoterm_id:0
-#: help:stock.container,incoterm_id:0
-msgid "Incoterm"
-msgstr ""
-
-#. module: container
-#: field:stock.container,product_id:0
-msgid "Product"
-msgstr ""
-
-#. module: container
-#: sql_constraint:sale.order:0
-msgid "Order Reference must be unique !"
-msgstr ""
-
-#. module: container
-#: view:stock.container:0
-msgid "Incoming Moves"
-msgstr ""
-
-#. module: container
-#: constraint:stock.move:0
-msgid "You try to assign a lot which is not from the same product"
-msgstr ""
-
-#. module: container
-#: help:stock.container,outgoing_move_list_ids:0
-msgid "Outgoing move List"
-msgstr ""
-
-#. module: container
-#: help:stock.container,container_stock_location_id:0
-msgid "Stck location of the container's contents"
-msgstr ""
-
-#. module: container
-#: help:stock.container,name:0
-msgid "Name of the container"
 msgstr ""
 
 #. module: container
@@ -142,65 +26,24 @@ msgid "Weight / Volume"
 msgstr ""
 
 #. module: container
-#: help:stock.container,address_id:0
-msgid "Address whom the container is located, used to retrieve it"
+#: help:stock.container,prod_serial:0
+msgid "Serial number of the product"
 msgstr ""
 
 #. module: container
-#: help:stock.container,incoming_move_list_ids:0
-msgid "Incoming move List"
-msgstr ""
-
-#. module: container
-#: help:stock.container,rdv_date:0
-msgid "Date and time at which the transporter will show up at final destination to deliver the container"
-msgstr ""
-
-#. module: container
-#: help:stock.container,sscc:0
-msgid "Serial Shipping Container Code : unique worldwide identifier for shipping units (given by the shipping company at booking). This field should be formatted to 18 numeric character."
-msgstr ""
-
-#. module: container
-#: field:stock.container,etm_date:0
-msgid "Estimated time to market"
-msgstr ""
-
-#. module: container
-#: help:stock.container,state:0
-msgid "Status of the container:\n"
-"  - Booking: The shipping company is preparing to ship\n"
-"  - Freight: The container is on the sea\n"
-"  - Clearance: The container is undergoing custom clearance\n"
-"  - Approaching: The container is being transported locally to its final destination and a meeting is organized with the logistic guy at destination location\n"
-"  - Unpacking: The container is being unpacked at its final destination\n"
-"  - Delivered: the container is archived with all fields locked"
+#: help:stock.move,container_id:0
+msgid "Container of this move"
 msgstr ""
 
 #. module: container
 #: view:stock.container:0
-#: selection:stock.container,state:0
-msgid "Unpacking"
+msgid "Group By..."
 msgstr ""
 
 #. module: container
-#: help:stock.container,remaining_volume:0
-msgid "The substraction of the container product gross volume minus the total GROSS volume of all products listed in incoming move lists of the container"
-msgstr ""
-
-#. module: container
-#: view:stock.container:0
-msgid "Dates"
-msgstr ""
-
-#. module: container
-#: field:stock.container,rdv_date:0
-msgid "RDV"
-msgstr ""
-
-#. module: container
-#: field:stock.container,name:0
-msgid "Name"
+#: field:stock.container.line,product_uom:0
+#: field:stock.partial.container.line,product_uom:0
+msgid "Unit of Measure"
 msgstr ""
 
 #. module: container
@@ -209,66 +52,23 @@ msgid "The total GROSS volume of all products listed in incoming move lists of t
 msgstr ""
 
 #. module: container
-#: field:stock.container,outgoing_move_list_ids:0
-msgid "Outgoing Move List"
-msgstr ""
-
-#. module: container
-#: view:stock.container:0
-msgid "Outgoing Moves"
-msgstr ""
-
-#. module: container
-#: model:ir.model,name:container.model_res_company
-msgid "Companies"
-msgstr ""
-
-#. module: container
-#: help:stock.container,weight:0
-msgid "The total weight of all products listed in incoming move lists of the container"
+#: view:stock.partial.container:0
+msgid "Product Moves"
 msgstr ""
 
 #. module: container
 #: constraint:stock.move:0
-msgid "You must assign a production lot for this product"
+msgid "You can not move products from or to a location of the type view."
 msgstr ""
 
 #. module: container
-#: field:stock.container,container_stock_location_id:0
-msgid "Container Stock Location"
+#: help:stock.container,container_stock_location_id:0
+msgid "Stck location of the container's contents"
 msgstr ""
 
 #. module: container
-#: field:stock.container,eta_date:0
-#: help:stock.container,eta_date:0
-msgid "Estimated date of arrival"
-msgstr ""
-
-#. module: container
-#: help:stock.container,prod_serial:0
-msgid "Serial number of the product"
-msgstr ""
-
-#. module: container
-#: help:stock.container,product_id:0
-msgid "The container product"
-msgstr ""
-
-#. module: container
-#: field:stock.container,prod_serial:0
-msgid "Product serial no."
-msgstr ""
-
-#. module: container
-#: view:stock.container:0
-#: selection:stock.container,state:0
-msgid "Clearance"
-msgstr ""
-
-#. module: container
-#: field:stock.container,etd_date:0
-#: help:stock.container,etd_date:0
-msgid "Date of departure"
+#: constraint:res.company:0
+msgid "The 'SIRET complement' should have exactly 5 digits."
 msgstr ""
 
 #. module: container
@@ -278,18 +78,61 @@ msgid "Approaching"
 msgstr ""
 
 #. module: container
-#: field:stock.container,volume:0
-msgid "Volume"
+#: help:stock.container,state:0
+msgid "Status of the container:\n"
+"  - Booking : The shipping company is preparing to ship\n"
+"  - Freight : The container is on the sea\n"
+"  - Clearance : The container is undergoing custom clearance\n"
+"  - Approaching : The container is being transported locally to its final destination and a meeting is organized with the logistic guy at destination location\n"
+"  - Unpacking : The container is being unpacked at its final destination\n"
+"  - Delivered : the container is archived with all fields locked"
 msgstr ""
 
 #. module: container
-#: field:stock.container,destination_warehouse_id:0
-msgid "Destination Warehouse"
+#: view:stock.container:0
+msgid "UoM"
 msgstr ""
 
 #. module: container
-#: field:stock.container,weight:0
-msgid "Weight"
+#: field:stock.partial.container,hide_tracking:0
+#: field:stock.partial.container.line,tracking:0
+msgid "Tracking"
+msgstr ""
+
+#. module: container
+#: help:stock.container,weight:0
+msgid "The total weight of all products listed in incoming move lists of the container"
+msgstr ""
+
+#. module: container
+#: field:stock.container,eta_date:0
+#: help:stock.container,eta_date:0
+msgid "Estimated date of arrival"
+msgstr ""
+
+#. module: container
+#: view:stock.partial.container:0
+msgid "Products"
+msgstr ""
+
+#. module: container
+#: field:stock.partial.container.line,update_cost:0
+msgid "Need cost update"
+msgstr ""
+
+#. module: container
+#: field:stock.container.line,product_qty_reserved:0
+msgid "Quantity Reserved"
+msgstr ""
+
+#. module: container
+#: field:stock.container,prod_serial:0
+msgid "Product serial no."
+msgstr ""
+
+#. module: container
+#: view:stock.container:0
+msgid "Reference"
 msgstr ""
 
 #. module: container
@@ -298,13 +141,9 @@ msgid "Stock Move"
 msgstr ""
 
 #. module: container
-#: help:stock.container,destination_warehouse_id:0
-msgid "Warehouse destination of the container's contents"
-msgstr ""
-
-#. module: container
-#: view:stock.container:0
-msgid "General"
+#: field:stock.container.line,move_id:0
+#: field:stock.partial.container.line,move_id:0
+msgid "Move"
 msgstr ""
 
 #. module: container
@@ -313,13 +152,166 @@ msgid "SSCC"
 msgstr ""
 
 #. module: container
-#: help:res.company,container_updates_dates:0
-msgid "Check to allow container to update dates on pickings and moves"
+#: view:stock.partial.container:0
+msgid "_Cancel"
 msgstr ""
 
 #. module: container
-#: field:stock.container,incoming_move_list_ids:0
-msgid "Incoming Move List"
+#: view:stock.container:0
+msgid "Partner"
+msgstr ""
+
+#. module: container
+#: field:stock.container,line_ids:0
+msgid "Line of container"
+msgstr ""
+
+#. module: container
+#: model:ir.model,name:container.model_sale_order
+msgid "Sales Order"
+msgstr ""
+
+#. module: container
+#: field:stock.container,address_id:0
+msgid "Address to retrieve the container"
+msgstr ""
+
+#. module: container
+#: model:ir.model,name:container.model_sale_order_line
+msgid "Sales Order Line"
+msgstr ""
+
+#. module: container
+#: view:stock.container:0
+msgid "End of container"
+msgstr ""
+
+#. module: container
+#: view:stock.container:0
+msgid "Add production lots"
+msgstr ""
+
+#. module: container
+#: constraint:res.company:0
+msgid "Error! You can not create recursive companies."
+msgstr ""
+
+#. module: container
+#: view:stock.container:0
+msgid "State"
+msgstr ""
+
+#. module: container
+#: model:ir.actions.act_window,name:container.act_open_container_stock_available
+msgid "Container stock available"
+msgstr ""
+
+#. module: container
+#: view:stock.container:0
+#: field:stock.partial.container.line,location_id:0
+msgid "Location"
+msgstr ""
+
+#. module: container
+#: model:ir.model,name:container.model_stock_picking
+msgid "Picking List"
+msgstr ""
+
+#. module: container
+#: model:ir.model,name:container.model_stock_partial_container
+msgid "Container Partial Picking"
+msgstr ""
+
+#. module: container
+#: help:stock.partial.container.line,cost:0
+msgid "Unit Cost for this product line"
+msgstr ""
+
+#. module: container
+#: help:stock.container,address_id:0
+msgid "Address whom the container is located, used to retrieve it"
+msgstr ""
+
+#. module: container
+#: help:stock.container,line_ids:0
+msgid "Line of the container"
+msgstr ""
+
+#. module: container
+#: help:stock.container,sscc:0
+msgid "Serial Shipping Container Code : unique worldwide identifier for shipping units (given by the shipping company at booking). This field should be formatted to 18 numeric character."
+msgstr ""
+
+#. module: container
+#: view:stock.container:0
+msgid "Line"
+msgstr ""
+
+#. module: container
+#: view:stock.container:0
+msgid "Dates"
+msgstr ""
+
+#. module: container
+#: help:stock.container.line,prodlot_id:0
+msgid "If lot is associate to this move, we add them"
+msgstr ""
+
+#. module: container
+#: field:stock.container,move_line_ids:0
+msgid "Outgoing Move List"
+msgstr ""
+
+#. module: container
+#: model:ir.model,name:container.model_stock_container_line
+msgid "Lines of container"
+msgstr ""
+
+#. module: container
+#: view:stock.container:0
+#: selection:stock.container,state:0
+msgid "Clearance"
+msgstr ""
+
+#. module: container
+#: field:stock.container.line,move_lot_ids:0
+msgid "Complementary lots moves"
+msgstr ""
+
+#. module: container
+#: view:stock.container:0
+#: selection:stock.container,state:0
+msgid "Unpacking"
+msgstr ""
+
+#. module: container
+#: help:stock.partial.container.line,currency:0
+msgid "Currency in which Unit cost is expressed"
+msgstr ""
+
+#. module: container
+#: field:stock.container,weight:0
+msgid "Weight"
+msgstr ""
+
+#. module: container
+#: field:stock.container.line,prodlot_id:0
+msgid "Lot associate to this move"
+msgstr ""
+
+#. module: container
+#: help:stock.container,destination_warehouse_id:0
+msgid "Warehouse destination of the container's contents"
+msgstr ""
+
+#. module: container
+#: help:stock.container,remaining_volume:0
+msgid "The substraction of the container product gross volume minus the total GROSS volume of all products listed in incoming move lists of the container"
+msgstr ""
+
+#. module: container
+#: field:stock.container.line,product_qty_received:0
+msgid "Quantity Received"
 msgstr ""
 
 #. module: container
@@ -335,27 +327,281 @@ msgstr ""
 
 #. module: container
 #: view:stock.container:0
+#: help:stock.container,move_line_ids:0
+msgid "Stock Moves"
+msgstr ""
+
+#. module: container
+#: view:stock.container:0
+#: selection:stock.container,state:0
+msgid "Draft"
+msgstr ""
+
+#. module: container
+#: model:ir.actions.act_window,name:container.act_open_stock_container_view
+#: model:ir.model,name:container.model_stock_container
+#: model:ir.ui.menu,name:container.menu_stock_container
+#: model:product.category,name:container.product_category_container
+#: view:res.company:0
+#: field:sale.order.line,container_id:0
+#: view:stock.container:0
+#: field:stock.container.line,container_id:0
+#: field:stock.move,container_id:0
+msgid "Container"
+msgstr ""
+
+#. module: container
+#: view:stock.move:0
+msgid "Stock moves"
+msgstr ""
+
+#. module: container
+#: field:stock.container,state:0
+msgid "Status"
+msgstr ""
+
+#. module: container
+#: view:stock.container:0
+msgid "Extended"
+msgstr ""
+
+#. module: container
+#: help:stock.container,product_id:0
+msgid "The container product"
+msgstr ""
+
+#. module: container
+#: constraint:stock.move:0
+msgid "You try to assign a lot which is not from the same product"
+msgstr ""
+
+#. module: container
+#: help:stock.container.line,move_lot_ids:0
+msgid "If more than one lot, use this fields to store them"
+msgstr ""
+
+#. module: container
+#: help:stock.container,name:0
+msgid "Name of the container"
+msgstr ""
+
+#. module: container
+#: field:stock.partial.container,date:0
+msgid "Date"
+msgstr ""
+
+#. module: container
+#: field:stock.container,rdv_date:0
+msgid "RDV"
+msgstr ""
+
+#. module: container
+#: model:ir.model,name:container.model_stock_move_split
+msgid "Split in Production lots"
+msgstr ""
+
+#. module: container
+#: model:ir.model,name:container.model_stock_partial_container_line
+msgid "stock.partial.container.line"
+msgstr ""
+
+#. module: container
+#: model:ir.model,name:container.model_res_company
+msgid "Companies"
+msgstr ""
+
+#. module: container
+#: field:stock.container,container_stock_location_id:0
+msgid "Container Stock Location"
+msgstr ""
+
+#. module: container
+#: field:stock.container,etm_date:0
+msgid "Estimated time to market"
+msgstr ""
+
+#. module: container
+#: sql_constraint:stock.picking:0
+msgid "Reference must be unique per Company!"
+msgstr ""
+
+#. module: container
+#: field:stock.container,etd_date:0
+#: help:stock.container,etd_date:0
+msgid "Date of departure"
+msgstr ""
+
+#. module: container
+#: field:stock.container.line,product_qty:0
+#: field:stock.partial.container.line,quantity:0
+msgid "Quantity"
+msgstr ""
+
+#. module: container
+#: field:stock.partial.container.line,prodlot_id:0
+msgid "Production Lot"
+msgstr ""
+
+#. module: container
+#: view:stock.partial.container:0
+msgid "_Validate"
+msgstr ""
+
+#. module: container
+#: view:stock.container:0
+msgid "General"
+msgstr ""
+
+#. module: container
+#: help:res.company,container_updates_dates:0
+msgid "Check to allow container to update dates on pickings and moves"
+msgstr ""
+
+#. module: container
+#: view:stock.container:0
 #: selection:stock.container,state:0
 msgid "Cancel"
 msgstr ""
 
 #. module: container
-#: model:ir.model,name:container.model_sale_order
-msgid "Sales Order"
+#: view:stock.container:0
+#: field:stock.partial.container,move_ids:0
+msgid "Moves"
 msgstr ""
 
 #. module: container
-#: field:stock.container,address_id:0
-msgid "Address to retrieve the container"
+#: field:stock.partial.container.line,location_dest_id:0
+msgid "Dest. Location"
+msgstr ""
+
+#. module: container
+#: sql_constraint:sale.order:0
+msgid "Order Reference must be unique per Company!"
+msgstr ""
+
+#. module: container
+#: selection:stock.container,state:0
+msgid "Delivered"
+msgstr ""
+
+#. module: container
+#: help:sale.order.line,container_id:0
+msgid "Container of this sale order line"
+msgstr ""
+
+#. module: container
+#: view:stock.container:0
+#: field:stock.container,incoming_move_list_ids:0
+msgid "Incoming Shipments"
+msgstr ""
+
+#. module: container
+#: field:stock.partial.container.line,wizard_id:0
+msgid "Wizard"
+msgstr ""
+
+#. module: container
+#: constraint:stock.move:0
+msgid "You must assign a production lot for this product"
+msgstr ""
+
+#. module: container
+#: field:res.company,container_updates_dates:0
+msgid "Container Updates Dates"
+msgstr ""
+
+#. module: container
+#: field:stock.container,partner_id:0
+msgid "Freight Broker"
+msgstr ""
+
+#. module: container
+#: view:stock.container:0
+#: selection:stock.container,state:0
+msgid "Booking"
+msgstr ""
+
+#. module: container
+#: field:stock.container,incoterm_id:0
+#: help:stock.container,incoterm_id:0
+msgid "Incoterm"
+msgstr ""
+
+#. module: container
+#: view:stock.container:0
+#: field:stock.container,product_id:0
+#: field:stock.container.line,product_id:0
+#: field:stock.partial.container.line,product_id:0
+msgid "Product"
+msgstr ""
+
+#. module: container
+#: view:stock.container:0
+msgid "Are you sure you have to unpacking all the container, and fill all moves quantity?"
+msgstr ""
+
+#. module: container
+#: field:stock.partial.container.line,currency:0
+msgid "Currency"
+msgstr ""
+
+#. module: container
+#: field:stock.container,volume:0
+msgid "Volume"
+msgstr ""
+
+#. module: container
+#: constraint:res.company:0
+msgid "Error msg is in raise"
+msgstr ""
+
+#. module: container
+#: help:stock.container,rdv_date:0
+msgid "Date and time at which the transporter will show up at final destination to deliver the container"
+msgstr ""
+
+#. module: container
+#: field:stock.partial.container,picking_id:0
+msgid "Picking"
+msgstr ""
+
+#. module: container
+#: model:ir.actions.act_window,name:container.action_partial_container
+msgid "Process Container"
+msgstr ""
+
+#. module: container
+#: sql_constraint:res.company:0
+msgid "The company name must be unique !"
+msgstr ""
+
+#. module: container
+#: field:stock.container,name:0
+msgid "Name"
+msgstr ""
+
+#. module: container
+#: view:stock.container:0
+msgid "Lines"
+msgstr ""
+
+#. module: container
+#: field:stock.container,destination_warehouse_id:0
+msgid "Destination Warehouse"
+msgstr ""
+
+#. module: container
+#: field:stock.partial.container.line,cost:0
+msgid "Cost"
+msgstr ""
+
+#. module: container
+#: help:stock.partial.container,hide_tracking:0
+msgid "This field is for internal purpose. It is used to decide if the column prodlot has to be shown on the move_ids field or not"
 msgstr ""
 
 #. module: container
 #: help:stock.container,etm_date:0
 msgid "Estimated date products available for delivery to customer"
-msgstr ""
-
-#. module: container
-#: model:ir.model,name:container.model_sale_order_line
-msgid "Sales Order Line"
 msgstr ""
 

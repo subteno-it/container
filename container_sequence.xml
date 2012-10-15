@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<openerp>
+    <data noupdate="1">
+        ##############################################################################
+        #
+        #    container module for OpenERP, Manages containers receipt
+        #    Copyright (C) 2012 SYLEAM ([http://www.syleam.fr/]) 
+        #              Christophe CHAUVET [christophe.chauvet@syleam.fr]
+        #              Sebastien LANGE [sebastien.lange@syleam.fr]
+        #
+        #    This file is a part of container
+        #
+        #    container is free software: you can redistribute it and/or modify
+        #    it under the terms of the GNU Affero General Public License as published by
+        #    the Free Software Foundation, either version 3 of the License, or
+        #    (at your option) any later version.
+        #
+        #    container is distributed in the hope that it will be useful,
+        #    but WITHOUT ANY WARRANTY; without even the implied warranty of
+        #    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+        #    GNU Affero General Public License for more details.
+        #
+        #    You should have received a copy of the GNU Affero General Public License
+        #    along with this program.  If not, see [http://www.gnu.org/licenses/].
+        #
+        ##############################################################################
+
+        <record id="seq_type_stock_container" model="ir.sequence.type">
+            <field name="name">Stock Container</field>
+            <field name="code">stock.container</field>
+        </record>
+
+        <record id="seq_stock_container" model="ir.sequence">
+            <field name="name">Stock Container</field>
+            <field name="code">stock.container</field>
+            <field name="prefix">SC%(year)s</field>
+            <field name="padding">4</field>
+            <field name="company_id" eval="False"/>
+        </record>
+
+    </data>
+</openerp>
